@@ -31,7 +31,9 @@ China unicom:  2555-2575 MHz
 
 Then those bands are scanned with my MATLAB scanner: https://github.com/JiaoXianjun/multi-rtl-sdr-calibration (see README_for_spectrum_scanner.txt in that repo. Or just search rtl-sdr in http://www.mathworks.com/matlabcentral/fileexchange/)
 
-See those .png files for spectrum plots. (For the band above 2.5GHz which has exceeded range of rtl-sdr dongle, a MMDS LNB is used to extend the band to above 2.5GHz. See MMDS-LNB-LO1998-to-extend-dongle-band.jpg. I learn this method from http://blog.cyberexplorer.me/2014/01/sniffing-and-decoding-nrf24l01-and.html and https://github.com/omriiluz/NRF24-BTLE-Decoder)
+See those .png files for spectrum plots. (For the band above 2.5GHz which has exceeded range of rtl-sdr dongle, a MMDS LNB is used to extend the band to above 2.5GHz. 
+See MMDS-LNB-LO1998-to-extend-dongle-band.jpg. I learn this method from http://blog.cyberexplorer.me/2014/01/sniffing-and-decoding-nrf24l01-and.html and https://github.com/omriiluz/NRF24-BTLE-Decoder. 
+The LO of my LNB is 1998MHz. It means that when the dongle is tuned to 600MHz, it actually receives 600+1998Mhz!)
 
 LTE-Cell-Scanner decodes LTE MIB successfully in 1850-1880MHz band, but unsuccessful for other bands even they seems pretty like LTE 20MHz spectrum.
 
