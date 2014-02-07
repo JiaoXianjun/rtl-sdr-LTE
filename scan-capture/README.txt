@@ -5,7 +5,7 @@ After they are decompressed, you will see:
 *.it are captured by CellSearch (https://github.com/Evrytania/LTE-Cell-Scanner)
 *.bin are captured by rtl_sdr (http://sdr.osmocom.org/trac/wiki/rtl-sdr)
 
-Three it files (0000, 0001, 0002) are from low exact and high frequencies.
+Three it files (0000, 0001, 0002) are from lower(-100kHz) exact and higher(+100kHz) frequencies.
 
 Example rules of bin file name:
 
