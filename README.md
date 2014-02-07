@@ -5,6 +5,8 @@ Play with LTE signal captured by rtl-sdr.
 
 By a enthusiast <putaoshu@msn.com> <putaoshu@gmail.com> of Software Defined Radio.
 
+Some files are borrowed from https://github.com/Evrytania/LTE-Cell-Scanner, https://github.com/Evrytania/Matlab-Library and https://github.com/JiaoXianjun/multi-rtl-sdr-calibration
+
 As China has announced TD-LTE deployment officially, I want to decode it with LTE-Cell-Scanner (written by James Peroulas: https://github.com/Evrytania/LTE-Cell-Scanner).
 
 Then there are some discoveries:
@@ -47,8 +49,8 @@ Now TD-LTE signal is identified successfully, maybe adding TD-LTE support to LTE
 
 Please join me if you are also interested in this. Please see TODO firstly.
 
+News
 =======================
-News:
 2014-01-07:
 
 PSS has been detected successfully at frequency 2645MHz! See comments in matlab/test_td_lte_pss.m, and then run it.
