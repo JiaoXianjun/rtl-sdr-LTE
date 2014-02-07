@@ -7,7 +7,12 @@
 % https://github.com/JiaoXianjun/multi-rtl-sdr-calibration
 
 % example: test_td_lte_pss('../scan-capture/frequency-2635-2655MHz/f2645_s1.92_g0_1s.bin')
-% Those bin files are captured by rtl_sdr.
+% Those bin files are captured by rtl_sdr:
+% rtl_sdr -f 900e6 -s 1.92e6 -n 1.92e6 tmp.bin
+% -f 900MHz
+% -s 1.92MHz sampling rate
+% -n 1.92e6 samples
+% result in tmp.bin with size 2*1.92e6 bytes because two bytes (I&Q) for one sample.
 
 % See also README in root directory and ../scan-capture.
 
