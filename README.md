@@ -55,7 +55,15 @@ Usage
 =======================
 2014-01-07:
 
-See comments in matlab/test_td_lte_pss.m, and then run it. PSS has been detected successfully at frequency 2645MHz!
+--test_td_lte_pss.m
+
+Enter matlab directory, and run:
+
+test_td_lte_pss('../scan-capture/frequency-2635-2655MHz/f2645_s1.92_g0_1s.bin')
+
+--extract_part_from_rtl_sdr_bin.m
+
+If you have huge captured bin file, extract_part_from_rtl_sdr_bin.m can be used to extract part of it as a new bin file.
 
 Contributing
 =======================

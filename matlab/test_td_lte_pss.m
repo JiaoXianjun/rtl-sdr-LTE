@@ -6,22 +6,29 @@
 % https://github.com/Evrytania/Matlab-Library
 % https://github.com/JiaoXianjun/multi-rtl-sdr-calibration
 
-% Before run this script, you should decompress those .7z files in ../scan-capture/frequency-xxxx-xxxxMHz/ firstly.
+% example: test_td_lte_pss('../scan-capture/frequency-2635-2655MHz/f2645_s1.92_g0_1s.bin')
 % Those bin files are captured by rtl_sdr.
 
 % See also README in root directory and ../scan-capture.
 
-clear all;
-close all;
+% clear all;
+% close all;
 
-sampling_rate = 1.92e6;
+function test_td_lte_pss(rtl_sdr_bin_filename)
+
+sampling_rate = 1.92e6; % LTE spec. baseband sampling rate of 1.4MHz bandwidth option.
 
 len_time = 40e-3;
 num_samples = len_time*sampling_rate;
 
-fid = fopen('../scan-capture/frequency-2635-2655MHz/f647_s1.92_g0_10s.bin');
+fid = fopen(rtl_sdr_bin_filename);
 s = fread(fid, inf, 'uint8');
 fclose(fid);
+
+if length(s) < (2*num_samples)
+    disp('Please capture signal with at least 40ms length!');
+    return;
+end
 
 s = raw2iq(s(1:num_samples));
 
