@@ -1,16 +1,17 @@
 % Jiao Xianjun (putaoshu@msn.com; putaoshu@gmail.com)
-% Find out coarse sample index of beginning of LTE PSS
+% Find out LTE PSS in the signal stream and correct sampling&carrier error.
 % A script of project: https://github.com/JiaoXianjun/rtl-sdr-LTE
 
-function [position, pss_idx] = PSS_coarse_position(s, fd_pss)
+function [position, pss_idx] = PSS_detection_correction(s, fd_pss, td_pss)
 disp(' ');
 position = -1;
 pss_idx = -1;
 
-fft_len = 128; % LTE spec. OFDM symbole body length under 1.92Msps
+% fft_len = 128; % LTE spec. OFDM symbole body length under 1.92Msps
+fft_len = size(td_pss, 1);
 
 len = length(s);
-th = 9; %dB. threshold
+th = 100; %dB. threshold
 mv_len = 10*fft_len;
 
 sampling_rate = 1.92e6; % LTE spec. 30.72MHz/16.
@@ -21,7 +22,7 @@ num_subframe_per_radioframe = 10;
 num_sample_per_radioframe = num_sample_per_subframe*num_subframe_per_radioframe;
 
 % find out first PSS in the first radio frame by moving FFT
-[hit_flag, hit_idx, hit_avg_snr, hit_snr, hit_fo, pss_idx] = move_fft_snr_runtime_avg(s(1:num_sample_per_radioframe), fd_pss, mv_len, fft_len, th);
+[hit_flag, hit_idx, hit_avg_snr, hit_snr, hit_fo, pss_idx] = move_fft_snr_runtime_avg(s(1:num_sample_per_radioframe), td_pss((end-fft_len+1):end,:), mv_len, fft_len, th);
 disp([hit_idx hit_fo]);
 if ~hit_flag
     disp('PSS coarse: No PSS found!');

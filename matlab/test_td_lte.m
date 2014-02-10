@@ -34,17 +34,15 @@ len_time_subframe = 1e-3; % 1ms. LTE spec
 len_time_radioframe = len_time_subframe*num_subframe_per_radioframe;
 len_time_total = len_time_radioframe*num_radioframe;
 
-num_sample = len_time_total*sampling_rate;
+[fd_pss, td_pss] = pss_gen;
 
+num_sample = len_time_total*sampling_rate;
 r = read_rtl_sdr_bin2IQ(rtl_sdr_bin_filename, num_sample);
 
 % LTE channle filter for 6 RB
 coef = fir1(46, (0.18e6*6+12*15e3)/sampling_rate);
 % freqz(coef, 1, 1024);
-
-[fd_pss, td_pss] = pss_gen;
-
 % channel filter
 r = filter(coef, 1, r);
 
-[position, pss_idx] = PSS_coarse_position(r, fd_pss);
+[position, pss_idx] = PSS_detection_correction(r, fd_pss, td_pss);

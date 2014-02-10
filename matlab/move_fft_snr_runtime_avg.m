@@ -2,8 +2,8 @@
 % Find out PSS location by moving FFT, peak averaging, Peak-to-Average-Ratio monitoring.
 % A script of project: https://github.com/JiaoXianjun/rtl-sdr-LTE
 
-function [hit_flag, hit_idx, hit_avg_snr, hit_snr, hit_fo, pss_idx] = move_fft_snr_runtime_avg(s, fd_pss, mv_len, fft_len, th)
-num_pss = size(fd_pss, 2);
+function [hit_flag, hit_idx, hit_avg_snr, hit_snr, hit_fo, pss_idx] = move_fft_snr_runtime_avg(s, td_pss, mv_len, fft_len, th)
+num_pss = size(td_pss, 2);
 
 hit_flag = false;
 hit_idx = -1;
@@ -24,18 +24,20 @@ signal_power = zeros(num_pss, 1);
 for i=1:(len - (fft_len-1))
     chn_tmp = s(i:(i+fft_len-1));
     
-%     chn_tmp = abs(fft(chn_tmp, fft_len)).^2;
-    tmp = fft(chn_tmp, fft_len);
-    tmp1 = [tmp; tmp(1:(end-1))];
-    tmp1_mat = lin2col_shift_mat(tmp1, fft_len);
-    tmp1_mat = [tmp1_mat(:, 1:(fft_len/4)) tmp1_mat(:, ((fft_len*3/4) + 1):end)]; % discard large frequency offset to save computations
-    chn_tmp = ( abs(fd_pss'*tmp1_mat).^2 );
+    chn_tmp = td_pss'.*kron(ones(num_pss, 1), chn_tmp.');
+    chn_tmp = abs(fft(chn_tmp, fft_len, 2)).^2;
+
+%     tmp = fft(chn_tmp, fft_len);
+%     tmp1 = [tmp; tmp(1:(end-1))];
+%     tmp1_mat = lin2col_shift_mat(tmp1, fft_len);
+%     tmp1_mat = [tmp1_mat(:, 1:(fft_len/4)) tmp1_mat(:, ((fft_len*3/4) + 1):end)]; % discard large frequency offset to save computations
+%     chn_tmp = ( abs(fd_pss'*tmp1_mat).^2 );
     
 %     signal_power = max(chn_tmp);
     [~, max_idx] = max(chn_tmp, [], 2);
     for j=1:num_pss
-        max_set = mod((max_idx(j) + (-1:1))-1, fft_len/2) + 1;
-%         max_set = mod((max_idx(j) + (-1:1))-1, fft_len) + 1;
+%         max_set = mod((max_idx(j) + (-1:1))-1, fft_len/2) + 1;
+        max_set = mod((max_idx(j) + (-1:1))-1, fft_len) + 1;
         signal_power(j) = sum( chn_tmp(j, max_set) );
     end
 
@@ -49,8 +51,8 @@ for i=1:(len - (fft_len-1))
     if sum(logic_tmp)
         hit_flag = true;
         pss_idx = find(logic_tmp==1);
-        chn_tmp = [chn_tmp(pss_idx, 1:(fft_len/4)), zeros(1, fft_len/2), chn_tmp(pss_idx, ((fft_len/4)+1) : end)];
-%         chn_tmp = chn_tmp(pss_idx,:);
+%         chn_tmp = [chn_tmp(pss_idx, 1:(fft_len/4)), zeros(1, fft_len/2), chn_tmp(pss_idx, ((fft_len/4)+1) : end)];
+        chn_tmp = chn_tmp(pss_idx,:);
         hit_fo = fo_from_fft_result(chn_tmp.', sampling_rate);
         hit_idx = i;
         hit_snr = snr(pss_idx);
