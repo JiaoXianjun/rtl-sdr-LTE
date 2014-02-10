@@ -2,6 +2,17 @@
 % analyze PSS detection under big frequency offset
 % A script of project: https://github.com/JiaoXianjun/rtl-sdr-LTE
 
+% according to simulation result, gold configuration is that use whole PSS (length 137), and fo step 50kHz
+% simulation result:
+% len pss 137 fo step 50kHz SNR 0dB 10000 cost 29.9569s fail rate 0.003
+% len pss 137 fo step 50kHz SNR 3dB 10000 cost 27.4461s fail rate 0
+% len pss 137 fo step 25kHz SNR 0dB 10000 cost 40.6559s fail rate 0.0025
+% len pss 137 fo step 25kHz SNR 3dB 10000 cost 41.6056s fail rate 0
+% len pss 128 fo step 50kHz SNR 0dB 10000 cost 23.6994s fail rate 0.0091
+% len pss 128 fo step 50kHz SNR 3dB 10000 cost 23.0074s fail rate 0.0002
+% len pss 128 fo step 25kHz SNR 0dB 10000 cost 41.1991s fail rate 0.0078
+% len pss 128 fo step 25kHz SNR 3dB 10000 cost 41.4224s fail rate 0
+
 % function test_pss_fo_corr
 clear all; 
 close all;
