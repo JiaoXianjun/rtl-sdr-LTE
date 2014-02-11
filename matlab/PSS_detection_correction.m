@@ -11,7 +11,6 @@ fft_len = size(td_pss, 1);
 
 len = length(s);
 th = 100; %dB. threshold
-mv_len = 4*fft_len;
 
 sampling_rate = 1.92e6; % LTE spec. 30.72MHz/16.
 
@@ -21,7 +20,7 @@ num_subframe_per_radioframe = 10;
 num_sample_per_radioframe = num_sample_per_subframe*num_subframe_per_radioframe;
 
 % find out first PSS in the first radio frame by moving FFT
-[hit_flag, hit_idx, hit_avg_snr, hit_snr, pss_idx] = move_fft_snr_runtime_avg(s(1:num_sample_per_radioframe), td_pss((end-fft_len+1):end,:), mv_len, fft_len, th);
+[hit_flag, hit_idx, hit_avg_snr, hit_snr, pss_idx] = move_fft_snr_runtime_avg(s(1:num_sample_per_radioframe), td_pss((end-fft_len+1):end,:), th);
 disp([hit_idx hit_fo]);
 if ~hit_flag
     disp('PSS coarse: No PSS found!');
