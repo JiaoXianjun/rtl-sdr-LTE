@@ -2,7 +2,7 @@
 % Find out PSS location by moving FFT, peak averaging, Peak-to-Average-Ratio monitoring.
 % A script of project: https://github.com/JiaoXianjun/rtl-sdr-LTE
 
-function [hit_flag, hit_idx, hit_avg_snr, hit_snr, hit_fo, pss_idx] = move_fft_snr_runtime_avg(s, td_pss, mv_len, fft_len, th)
+function [hit_flag, hit_idx, hit_avg_snr, hit_snr, pss_idx] = move_fft_snr_runtime_avg(s, td_pss, mv_len, fft_len, th)
 num_pss = size(td_pss, 2);
 
 hit_flag = false;
