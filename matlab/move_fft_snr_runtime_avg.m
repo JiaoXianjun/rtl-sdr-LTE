@@ -2,78 +2,90 @@
 % Find out PSS location by moving FFT, peak averaging, Peak-to-Average-Ratio monitoring.
 % A script of project: https://github.com/JiaoXianjun/rtl-sdr-LTE
 
-function [hit_flag, hit_idx, hit_avg_snr, hit_snr, pss_idx] = move_fft_snr_runtime_avg(s, pss, th)
+function [hit_flag, hit_idx, hit_sss_avg_power, hit_pss_power, pss_idx] = move_fft_snr_runtime_avg(s, pss, th)
 num_pss = size(pss, 2);
+len_pss = size(pss, 1);
 
 hit_flag = false;
 hit_idx = -1;
 pss_idx = -1;
-hit_avg_snr = inf;
-hit_snr = inf;
+hit_sss_avg_power = inf;
+hit_pss_power = inf;
 
 mv_len = 128+9; % the last OFDM symbol (SSS) of slot 1 and 11
 distance_pss_sss = 9+10+9 + 3*128; % normal CP case
-store_for_moving_avg = 999.*ones(num_pss, mv_len);
+store_for_moving_avg = 999.*ones(num_pss, distance_pss_sss);
 sampling_rate = 1.92e6; % LTE spec
 fo_search_set = [-200e3:50e3:200e3];
+% fo_search_set = 0e3;
+num_fo = length(fo_search_set);
 
-pss_set = kron(ones(1, length(fo_search_set)), pss).*exp(1i.*2.*pi.*(1./sampling_rate).*(0:(length(pss)-1)).'*fo_search_set);
+pss_set = zeros(len_pss, num_fo, num_pss);
+for i=1:num_pss
+    pss_set(:,:,i) = kron(ones(1, num_fo), pss(:,i)).*exp(1i.*2.*pi.*(1./sampling_rate).*(0:(len_pss-1)).'*fo_search_set);
+end
 
-sum_snr = sum(store_for_moving_avg, 2);
+sum_power = sum(store_for_moving_avg(:, (end-mv_len+1):end), 2);
 
 len = length(s);
-corr_len = size(pss, 1);
-snr_record = zeros(num_pss, len - (corr_len-1));
+metric_record = zeros(len - (len_pss-1), num_fo, num_pss);
 
+% calculate matrix for segment corr
+len_seg = len_pss;
+num_seg = floor(len_pss/len_seg);
+len_corr = len_seg*num_seg;
+fetch_matrix = zeros(num_seg, len_corr);
+for i=1:num_seg
+    sp = (i-1)*len_seg + 1;
+    ep = sp + len_seg - 1;
+    fetch_matrix(i, sp:ep) = 1;
+end
 
-signal_power = zeros(num_pss, 1);
-for i=1:(len - (corr_len-1))
-    chn_tmp = s(i:(i+corr_len-1));
+current_power = zeros(num_pss, 1);
+for i=1:(len - (len_pss-1))
+    chn_tmp = s(i:(i+len_pss-1));
     
-    chn_tmp = pss'.*kron(ones(num_pss, 1), chn_tmp.');
-    chn_tmp = abs(fft(chn_tmp, corr_len, 2)).^2;
-
-%     tmp = fft(chn_tmp, corr_len);
-%     tmp1 = [tmp; tmp(1:(end-1))];
-%     tmp1_mat = lin2col_shift_mat(tmp1, corr_len);
-%     tmp1_mat = [tmp1_mat(:, 1:(corr_len/4)) tmp1_mat(:, ((corr_len*3/4) + 1):end)]; % discard large frequency offset to save computations
-%     chn_tmp = ( abs(fd_pss'*tmp1_mat).^2 );
-    
-%     signal_power = max(chn_tmp);
-    [~, max_idx] = max(chn_tmp, [], 2);
     for j=1:num_pss
-%         max_set = mod((max_idx(j) + (-1:1))-1, corr_len/2) + 1;
-        max_set = mod((max_idx(j) + (-1:1))-1, corr_len) + 1;
-        signal_power(j) = sum( chn_tmp(j, max_set) );
+        pss = pss_set(:,:,j);
+        tmp = conj(pss).*kron(ones(1, num_fo), chn_tmp);
+        tmp = fetch_matrix*tmp(1:len_corr,:);
+        tmp = sum( abs(tmp).^2, 1 );
+        metric_record(i,:,j) = tmp;
+        current_power(j) = max(tmp);
     end
-
-    noise_power = sum(chn_tmp, 2) - signal_power;
-    snr = 10.*log10(signal_power./noise_power);
-    snr_record(:, i) = snr;
     
-    peak_to_avg = snr - (sum_snr./mv_len);
+    current_power_dB = 10.*log10(current_power);
+    avg_power_dB = 10.*log10(sum_power./mv_len);
+    peak_to_avg = current_power_dB - avg_power_dB;
 
     logic_tmp = (peak_to_avg > th);
     if sum(logic_tmp)
         hit_flag = true;
         pss_idx = find(logic_tmp==1);
-%         chn_tmp = [chn_tmp(pss_idx, 1:(corr_len/4)), zeros(1, corr_len/2), chn_tmp(pss_idx, ((corr_len/4)+1) : end)];
-        chn_tmp = chn_tmp(pss_idx,:);
-        hit_fo = fo_from_fft_result(chn_tmp.', sampling_rate);
         hit_idx = i;
-        hit_snr = snr(pss_idx);
-        hit_avg_snr = snr(pss_idx) - peak_to_avg(pss_idx);
-        figure; plot(chn_tmp);
-%         disp(['Hit. idx ' num2str(i) '; SNR ' num2str(snr) 'dB; peak SNR to avg SNR ' num2str(peak_to_avg) 'dB']);
+        hit_pss_power = current_power_dB(pss_idx);
+        hit_sss_avg_power = hit_pss_power - peak_to_avg(pss_idx);
         break;
     else
-        sum_snr = sum_snr - store_for_moving_avg(:, end);
-        sum_snr = sum_snr + snr;
+        sum_power = sum_power - store_for_moving_avg(:, end);
+        sum_power = sum_power + store_for_moving_avg(:, end-mv_len);
         
         store_for_moving_avg(:, 2:end) = store_for_moving_avg(:, 1:(end-1));
-        store_for_moving_avg(:, 1) = snr;
+        store_for_moving_avg(:, 1) = current_power;
     end
     
 end
 
-figure; plot(snr_record.');
+figure;
+for i=1:9
+    subplot(3,3,i); plot(metric_record(:,i,1));
+end
+figure;
+for i=1:9
+    subplot(3,3,i); plot(metric_record(:,i,2));
+end
+figure;
+for i=1:9
+    subplot(3,3,i); plot(metric_record(:,i,3));
+end
+
