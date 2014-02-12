@@ -10,7 +10,7 @@ pss_idx = -1;
 fft_len = size(td_pss, 1);
 
 len = length(s);
-th = 100; %dB. threshold
+th = 1000; %dB. threshold
 
 sampling_rate = 1.92e6; % LTE spec. 30.72MHz/16.
 

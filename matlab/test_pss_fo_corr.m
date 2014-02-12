@@ -35,7 +35,7 @@ r = zeros(1, 2*137);
 tmp_total = zeros(1, length(fo_search_set));
 num_test = 10000;
 num_fail = 0;
-snr = 0;
+snr = 3;
 sigma2 = var_pss/(10^(snr/10));
 correct_pos = 147 - (length(pss)-128);
 tic;
@@ -49,16 +49,28 @@ for idx = 1:num_test
 
     for i=1:(2*137)
         s = r_pss_fo(i:(i+length(pss)-1));
-        for j=1:length(fo_search_set)
-            tmp = conj(pss_set(:,j)).*s;
-            tmp = vec2mat(tmp, 8);
-            tmp = sum( abs(sum(tmp, 2)).^2 );
-%             r(i) = r(i) + tmp;
-            tmp_total(j) = tmp;
-        end
-        r(i) = max(tmp_total);
+        
+%         %  %---------method 1-----------------------
+%         for j=1:length(fo_search_set)
+%             tmp = conj(pss_set(:,j)).*s;
+%             tmp = vec2mat(tmp, 8);
+%             tmp = sum( abs(sum(tmp, 2)).^2 );
+% %             r(i) = r(i) + tmp;
+%             tmp_total(j) = tmp;
+%         end
+%         r(i) = max(tmp_total);
+%         %  %---------end of method 1-----------------------
+        
+%         %  %---------method 2-----------------------
+%         r(i) = abs(s(1:64)'*s(128:-1:65))^2;
+%         %  %---------end of method 2-----------------------
+        
+        %  %---------method 3-----------------------
+        tmp = conj(pss).*s;
+        r(i) = max(abs(fft(tmp)).^2);
+        %  %---------end of method 3-----------------------
     end
-%     plot(r); drawnow;
+    plot(r); drawnow;
     % plot(138, r(138), 'rs');
     
     if mod(idx, 100) == 0
