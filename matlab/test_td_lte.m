@@ -21,6 +21,8 @@
 clear all;
 close all;
 rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz/f2645_s1.92_g0_1s.bin';
+% rtl_sdr_bin_filename = '../scan-capture/frequency-2595-2615MHz/f2604.9_s1.92_g0_1s.bin';
+% rtl_sdr_bin_filename = '../scan-capture/frequency-2575-2595MHz/f2585_s1.92_g0_1s.bin';
 
 num_radioframe = 5; % each radio frame length 10ms. MIB period is 4 radio frame
 
@@ -45,4 +47,18 @@ coef = fir1(46, (0.18e6*6+12*15e3)/sampling_rate);
 % channel filter
 r = filter(coef, 1, r);
 
-[position, pss_idx] = PSS_detection_correction(r, fd_pss, td_pss);
+% % because MMDS LNB is used. No relationship between timing and frequency
+% % try to correct timing firstly. Then to use LTE-Cell-Scanner with
+% % timing-frequency relationship avoiding.
+[position, pss_idx, r_timing_correct] = PSS_detection_correction(r, fd_pss, td_pss);
+
+capbuf = r_timing_correct.';
+% freq_start = 2e9;
+% ppm = 100;
+% n_extra=floor((freq_start*ppm/1e6+2.5e3)/5e3);
+% f_search_set = (-n_extra*5e3) : 5e3 : (n_extra*5e3);
+f_search_set = -100e3 : 5e3 : 100e3;
+ds_comb_arm = 2;
+
+[xc_incoherent_collapsed_pow xc_incoherent_collapsed_frq n_comb_xc n_comb_sp xc_incoherent_single xc_incoherent sp_incoherent xc sp]= ...
+xcorr_pss(capbuf,f_search_set,ds_comb_arm,fc);

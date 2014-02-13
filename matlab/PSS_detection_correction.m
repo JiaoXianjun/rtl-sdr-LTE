@@ -2,10 +2,11 @@
 % Find out LTE PSS in the signal stream and correct sampling&carrier error.
 % A script of project: https://github.com/JiaoXianjun/rtl-sdr-LTE
 
-function [position, pss_idx] = PSS_detection_correction(s, fd_pss, td_pss)
+function [position, pss_idx, r] = PSS_detection_correction(s, fd_pss, td_pss)
 disp(' ');
 position = -1;
 pss_idx = -1;
+r = -1;
 
 fft_len = size(td_pss, 1);
 
@@ -20,7 +21,7 @@ num_subframe_per_radioframe = 10;
 num_sample_per_radioframe = num_sample_per_subframe*num_subframe_per_radioframe;
 
 % find out first PSS in the first radio frame by moving FFT
-[hit_flag, hit_idx, hit_avg_snr, hit_snr, pss_idx] = move_fft_snr_runtime_avg(s(1:num_sample_per_radioframe), td_pss((end-fft_len+1):end,:), th);
+[hit_flag, hit_idx, hit_avg_snr, hit_snr, pss_idx] = pss_initial_search(s(1:4*num_sample_per_radioframe), td_pss((end-fft_len+1):end,:), th);
 disp([hit_idx hit_fo]);
 if ~hit_flag
     disp('PSS coarse: No PSS found!');
