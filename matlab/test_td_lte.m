@@ -20,8 +20,9 @@
 
 clear all;
 close all;
-rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz-know-PPM/f2645_s1.92_g20_SamplingPPM26.2_1s.bin';
-% rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz/f2645_s1.92_g0_1s.bin';
+% rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz-know-PPM/f2645_s1.92_g0_SamplingPPM26.2_1s.bin';
+% rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz-know-PPM/f2645_s1.92_g20_SamplingPPM26.2_1s.bin';
+rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz/f2645_s1.92_g0_1s.bin';
 % rtl_sdr_bin_filename = '../scan-capture/frequency-2595-2615MHz/f2604.9_s1.92_g0_1s.bin';
 % rtl_sdr_bin_filename = '../scan-capture/frequency-2575-2595MHz/f2585_s1.92_g0_1s.bin';
 
@@ -43,23 +44,36 @@ num_sample = len_time_total*sampling_rate;
 r = read_rtl_sdr_bin2IQ(rtl_sdr_bin_filename, num_sample);
 
 % LTE channle filter for 6 RB
-coef = fir1(46, (0.18e6*6+12*15e3)/sampling_rate);
+coef = fir1(46, (0.18e6*6+16*15e3)/sampling_rate);
 % freqz(coef, 1, 1024);
 % channel filter
 r = filter(coef, 1, r);
 
+% ppm_val = 116.4426;
+ppm_val = 26.2009;
+r_timing_correct = sampling_frequency_correction(r, ppm_val);
+
 % % because MMDS LNB is used. No relationship between timing and frequency
 % % try to correct timing firstly. Then to use LTE-Cell-Scanner with
 % % timing-frequency relationship avoiding.
-[position, pss_idx, r_timing_correct] = PSS_detection_correction(r, fd_pss, td_pss);
+% [position, pss_idx, r_timing_correct] = PSS_detection_correction(r, fd_pss, td_pss);
 
 capbuf = r_timing_correct.';
 % freq_start = 2e9;
 % ppm = 100;
 % n_extra=floor((freq_start*ppm/1e6+2.5e3)/5e3);
 % f_search_set = (-n_extra*5e3) : 5e3 : (n_extra*5e3);
-f_search_set = -100e3 : 5e3 : 100e3;
-ds_comb_arm = 2;
+% f_search_set = -100e3 : 5e3 : 100e3;
+f_search_set = -95e3 : 5e3 : -85e3;
+DS_COMB_ARM = 2;
+fc = inf;
 
 [xc_incoherent_collapsed_pow xc_incoherent_collapsed_frq n_comb_xc n_comb_sp xc_incoherent_single xc_incoherent sp_incoherent xc sp]= ...
-xcorr_pss(capbuf,f_search_set,ds_comb_arm,fc);
+xcorr_pss(capbuf,f_search_set,DS_COMB_ARM,fc);
+
+FS_LTE = 30720000;
+thresh1_n_nines=12;
+R_th1=chi2cdf_inv(1-(10.0^(-thresh1_n_nines)), 2*n_comb_xc*(2*DS_COMB_ARM+1));
+rx_cutoff=(6*12*15e3/2+4*15e3)/(FS_LTE/16/2);
+Z_th1=R_th1*sp_incoherent/rx_cutoff/137/2/n_comb_xc/(2*DS_COMB_ARM+1);
+peaks=peak_search(xc_incoherent_collapsed_pow,xc_incoherent_collapsed_frq,Z_th1,f_search_set);

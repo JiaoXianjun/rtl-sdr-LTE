@@ -70,9 +70,13 @@ xc_incoherent=NaN(3,9600,n_f);
 xc_incoherent_single=NaN(3,9600,n_f);
 n_comb_xc=floor((size(xc,2)-100)/9600);
 for foi=1:n_f
-  f_off=f_search_set(foi);
-  % fc*k_factor is the receiver's actual RX center frequency.
-  k_factor=(fc-f_off)/fc;
+    
+%   f_off=f_search_set(foi);
+%   % fc*k_factor is the receiver's actual RX center frequency.
+%   k_factor=(fc-f_off)/fc;
+    
+  k_factor = 1; % because it is already corrected outside
+  
   for t=1:3
     %xc_incoherent_single(t,:,foi)=sum(transpose(reshape(absx2(xc(t,1:n_comb_xc*9600,foi)),9600,n_comb_xc)),1)/n_comb_xc;
     %xc_incoherent_single(t,:,foi)=absx2(xc(t,1:9600,foi));
