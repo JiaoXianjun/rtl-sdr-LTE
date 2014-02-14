@@ -1,0 +1,17 @@
+black 820T dongle, MCX antenna interface, RTL2838UHIDIR, SN: 00000013
+rtl_test -p
+Supported gain values (29): 0.0 0.9 1.4 2.7 3.7 7.7 8.7 12.5 14.4 15.7 16.6 19.7 20.7 22.9 25.4 28.0 29.7 32.8 33.8 36.4 37.2 38.6 40.2 42.1 43.4 43.9 44.5 48.0 49.6 
+actual sampling rate > setting sampling rate: 107PPM
+gsm_sync_demod at HPL office, 941.6MHz, 204 GSM frame: 116.4426PPM = (116.6457e-6 - 0.2031e-6)/(1+0.2031e-6)
+116.6457PPM is measured by gsm_sync_demod
+0.2031PPM comes from: 1e6*(2166667.106711 - 2166666.666667)/2166666.666667
+2166667.106711Hz is the actual set sampling frequency when set 2166666.666667Hz to dongle
+
+black 820T dongle, MCX antenna interface, RTL2838UHIDIR, SN: 00000001
+rtl_test -p
+Supported gain values (29): 0.0 0.9 1.4 2.7 3.7 7.7 8.7 12.5 14.4 15.7 16.6 19.7 20.7 22.9 25.4 28.0 29.7 32.8 33.8 36.4 37.2 38.6 40.2 42.1 43.4 43.9 44.5 48.0 49.6 
+actual sampling rate > setting sampling rate: 22.66667PPM
+gsm_sync_demod at HPL office, 941.6MHz, 204 GSM frame: 26.2009PPM = (26.404e-6 - 0.2031e-6)/(1+0.2031e-6)
+26.404PPM is measured by gsm_sync_demod
+0.2031PPM comes from: 1e6*(2166667.106711 - 2166666.666667)/2166666.666667
+2166667.106711Hz is the actual set sampling frequency when set 2166666.666667Hz to dongle
