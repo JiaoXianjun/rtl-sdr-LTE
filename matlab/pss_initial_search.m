@@ -52,9 +52,9 @@ for i=1:(len - (len_pss-1))
         tmp = conj(pss).*kron(ones(1, num_fo), chn_tmp);
         tmp = fetch_matrix*tmp(1:len_corr,:);
         tmp = sum( abs(tmp).^2, 1 );
-%         metric_record(i,:,j) = tmp;
+        metric_record(i,:,j) = tmp;
         current_power(j) = max(tmp);
-        metric_record(i,1,j) = current_power(j);
+%         metric_record(i,1,j) = current_power(j);
     end
     
     current_power_dB = 10.*log10(current_power);
@@ -79,34 +79,34 @@ for i=1:(len - (len_pss-1))
     
 end
 
-figure;
-subplot(3,1,1); plot(metric_record(:,1,1));
-subplot(3,1,2); plot(metric_record(:,1,2));
-subplot(3,1,3); plot(metric_record(:,1,3));
+% figure;
+% subplot(3,1,1); plot(metric_record(:,1,1));
+% subplot(3,1,2); plot(metric_record(:,1,2));
+% subplot(3,1,3); plot(metric_record(:,1,3));
 
-% figure;
-% for i=1:20
-%     subplot(4,5,i); plot(metric_record(:,i,1));
-% end
-% figure;
-% for i=1:20
-%     subplot(4,5,i); plot(metric_record(:,i,2));
-% end
-% figure;
-% for i=1:20
-%     subplot(4,5,i); plot(metric_record(:,i,3));
-% end
-% 
-% figure;
-% for i=21:40
-%     subplot(4,5,i-20); plot(metric_record(:,i,1));
-% end
-% figure;
-% for i=21:40
-%     subplot(4,5,i-20); plot(metric_record(:,i,2));
-% end
-% figure;
-% for i=21:40
-%     subplot(4,5,i-20); plot(metric_record(:,i,3));
-% end
+figure;
+for i=1:20
+    subplot(4,5,i); plot(metric_record(:,i,1));
+end
+figure;
+for i=1:20
+    subplot(4,5,i); plot(metric_record(:,i,2));
+end
+figure;
+for i=1:20
+    subplot(4,5,i); plot(metric_record(:,i,3));
+end
+
+figure;
+for i=21:40
+    subplot(4,5,i-20); plot(metric_record(:,i,1));
+end
+figure;
+for i=21:40
+    subplot(4,5,i-20); plot(metric_record(:,i,2));
+end
+figure;
+for i=21:40
+    subplot(4,5,i-20); plot(metric_record(:,i,3));
+end
 
