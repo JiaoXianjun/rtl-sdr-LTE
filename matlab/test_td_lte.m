@@ -20,7 +20,8 @@
 
 clear all;
 close all;
-rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz/f2645_s1.92_g0_1s.bin';
+rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz-know-PPM/f2645.2_s1.92_g20_SamplingPPM26.2_10s.bin';
+% rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz/f2645_s1.92_g0_1s.bin';
 % rtl_sdr_bin_filename = '../scan-capture/frequency-2595-2615MHz/f2604.9_s1.92_g0_1s.bin';
 % rtl_sdr_bin_filename = '../scan-capture/frequency-2575-2595MHz/f2585_s1.92_g0_1s.bin';
 
