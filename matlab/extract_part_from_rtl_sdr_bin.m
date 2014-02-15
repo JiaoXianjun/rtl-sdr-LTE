@@ -1,5 +1,6 @@
 % Jiao Xianjun (putaoshu@msn.com; putaoshu@gmail.com)
 % Extract part of rtl-sdr captured bin into a new file.
+% A script of project: https://github.com/JiaoXianjun/rtl-sdr-LTE
 
 function extract_part_from_rtl_sdr_bin(input_file_name, num_skip_bytes, num_extract_bytes, output_file_name)
 

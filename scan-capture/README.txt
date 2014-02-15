@@ -14,3 +14,5 @@ sampling rate -- 1.92MHz
          gain -- 0 (automatic gain)
            1s -- length of capture period
 
+Scanned/demodulated information is also listed in each directory.
+

@@ -1,4 +1,5 @@
-function [peak_out sss_h1_np_est sss_h2_np_est sss_h1_nrm_est sss_h2_nrm_est sss_h1_ext_est sss_h2_ext_est]=sss_detect(peak,capbuf,thresh2_n_sigma,fc)
+function [peak_out sss_h1_np_est sss_h2_np_est sss_h1_nrm_est sss_h2_nrm_est sss_h1_ext_est sss_h2_ext_est]= ...
+    sss_detect(peak,capbuf,thresh2_n_sigma,fc,sampling_carrier_twist,tdd_flag)
 
 % Perform maximum likelihood estimation of the SSS.
 
@@ -24,12 +25,18 @@ peak_freq=peak.freq;
 n_id_2_est=peak.n_id_2;
 
 % % fc*k_factor is the receiver's actual RX center frequency.
-% k_factor=(fc-peak.freq)/fc;
+if sampling_carrier_twist==1
+    k_factor=(fc-peak.freq)/fc;
+else
+    k_factor=1;
+end
 
-k_factor=1;
-
-if (peak_loc<(480)+32) % TDD
-% if (peak_loc+9<163) % FDD
+if tdd_flag == 1
+    min_idx = 3*(128+32)+32;
+else
+    min_idx = 163-9;
+end
+if (peak_loc<min_idx) % TDD
   peak_loc=peak_loc+9600*k_factor;
 end
 pss_loc_set=peak_loc:9600*k_factor:length(capbuf)-125-9;
@@ -74,8 +81,11 @@ for k=1:n_pss
   pss_np(k)=sigpower(h_sm(k,:)-h_raw(k,:));
 
   % Calculate the SSS in the frequency domain (ext)
-  sss_ext_dft_location=pss_dft_location-3*(128+32); % TDD
-%   sss_ext_dft_location=pss_dft_location-128-32; % FDD
+  if tdd_flag == 1
+    sss_ext_dft_location=pss_dft_location-3*(128+32); % TDD
+  else
+    sss_ext_dft_location=pss_dft_location-128-32; % FDD
+  end
   dft_in=fshift(capbuf(sss_ext_dft_location:sss_ext_dft_location+127),-peak_freq,fs_lte/16);
   % TOC
   dft_in=[dft_in(3:end) dft_in(1:2)];
@@ -83,8 +93,11 @@ for k=1:n_pss
   sss_ext_raw(k,1:62)=[dft_out(end-30:end) dft_out(2:32)];
 
   % Calculate the SSS in the frequency domain (nrm)
-  sss_nrm_dft_location=pss_dft_location-412; % TDD
-%   sss_nrm_dft_location=pss_dft_location-128-9; % FDD
+  if tdd_flag == 1
+    sss_nrm_dft_location=pss_dft_location-412; % TDD
+  else
+    sss_nrm_dft_location=pss_dft_location-128-9; % FDD
+  end
   dft_in=fshift(capbuf(sss_nrm_dft_location:sss_nrm_dft_location+127),-peak_freq,fs_lte/16);
   % TOC
   dft_in=[dft_in(3:end) dft_in(1:2)];
@@ -157,17 +170,27 @@ for t=0:167
 end
 
 %warning('Check code here!!!!');
+cp_type_flag = 0;
 if (max(log_lik_nrm(:))>max(log_lik_ext(:)))
   cp_type_est='normal';
+  cp_type_flag = 0;
   log_lik=log_lik_nrm;
 else
   cp_type_est='extended';
+  cp_type_flag = 1;
   log_lik=log_lik_ext;
 end
 % frame_start is the location of the 'start' of the cp of the frame.
 % The first DFT for the frame should be located at frame_start+cp_length
-frame_start=peak_loc+(128+9-1920-(3*(128+9)+1)-2)*k_factor; % TDD NORMAL CP
-% frame_start=peak_loc+(128+9-960-2)*k_factor; % FDD
+if tdd_flag==1
+    if cp_type_flag == 0
+        frame_start=peak_loc+(-(2*(128+9)+1)-1920-2)*k_factor; % TDD NORMAL CP
+    else
+        frame_start=peak_loc+(-(2*(128+32))-1920-2)*k_factor; % TDD EXTENDED CP
+    end
+else
+    frame_start=peak_loc+(128+9-960-2)*k_factor; % FDD
+end
 if (max(log_lik(:,1))>max(log_lik(:,2)))
   ll=log_lik(:,1);
 else

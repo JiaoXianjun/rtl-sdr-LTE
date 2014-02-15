@@ -194,7 +194,7 @@ if (found)
   phich_res_map=[1/6 1/2 1 2];
   if phich_res
     peak_out.phich_res=phich_res_map(phich_res);
-  else
+  else % for TDD, is can be zero
     peak_out.phich_res=phich_res;
   end
 

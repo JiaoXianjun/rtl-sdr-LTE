@@ -1,4 +1,4 @@
-function [tfg_comp tfg_comp_timestamp peak_out]=tfoec(peak,tfg,tfg_timestamp,fc);
+function [tfg_comp tfg_comp_timestamp peak_out]=tfoec(peak,tfg,tfg_timestamp,fc,sampling_carrier_twist);
 
 % Compensates for frequency offset, time offset, and also rotates the
 % RS so that they properly reflect the channel response.
@@ -26,8 +26,11 @@ n_id_2=peak.n_id_2;
 cp_type=peak.cp_type;
 
 % fc*k_factor is the receiver's actual RX center frequency.
-% k_factor=(fc-peak.freq_fine)/fc;
-k_factor=1;
+if sampling_carrier_twist==1
+    k_factor=(fc-peak.freq_fine)/fc;
+else
+    k_factor=1;
+end
 
 % Second order derivations
 n_ofdm=size(tfg,1);
@@ -113,8 +116,11 @@ peak_out.freq_superfine=peak_out.freq_fine+residual_f;
 
 % Perform FOC. This does not compensate for the ICI, only the bulk
 % frequency offset and time shift between OFDM symbols.
-% k_factor_residual=(fc-residual_f)/fc;
-k_factor_residual=1;
+if sampling_carrier_twist==1
+    k_factor_residual=(fc-residual_f)/fc;
+else
+    k_factor_residual=1;
+end
 
 tfg_comp=NaN(size(tfg));
 tfg_comp_timestamp=1+k_factor_residual*(tfg_timestamp-1);

@@ -1,5 +1,7 @@
 % Jiao Xianjun (putaoshu@msn.com; putaoshu@gmail.com)
 % read specific number of IQ samples from rtl-sdr captured bin file
+% A script of project: https://github.com/JiaoXianjun/rtl-sdr-LTE
+
 function s = read_rtl_sdr_bin2IQ(rtl_sdr_bin_filename, num_sample)
 
 fid = fopen(rtl_sdr_bin_filename);

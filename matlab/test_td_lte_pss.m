@@ -1,6 +1,8 @@
 % Jiao Xianjun (putaoshu@msn.com; putaoshu@gmail.com)
 % test_td_lte_pss.m
 % Try to identify if the signal I captured in Beijing is TD-LTE or not by using PSS correlation (written by James Peroulas).
+% A script of project: https://github.com/JiaoXianjun/rtl-sdr-LTE
+
 % Some scripts are borrowed from:
 % https://github.com/Evrytania/LTE-Cell-Scanner
 % https://github.com/Evrytania/Matlab-Library

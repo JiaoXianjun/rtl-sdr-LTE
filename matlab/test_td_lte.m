@@ -1,6 +1,8 @@
 % Jiao Xianjun (putaoshu@msn.com; putaoshu@gmail.com)
 % test_td_lte.m
 % Try to demodulate China TD-LTE signal in 1.4MHz bandwidth(1.92Msps) like Lte-Cell-Scanner (written by James Peroulas).
+% A script of project: https://github.com/JiaoXianjun/rtl-sdr-LTE
+
 % Some scripts are borrowed from:
 % https://github.com/Evrytania/LTE-Cell-Scanner
 % https://github.com/Evrytania/Matlab-Library

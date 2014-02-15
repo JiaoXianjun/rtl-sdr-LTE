@@ -1,4 +1,4 @@
-function [tfg tfg_timestamp]=extract_tfg(peak,capbuf,fc);
+function [tfg tfg_timestamp]=extract_tfg(peak,capbuf,fc,sampling_carrier_twist);
 
 % Convert from time domain to frequency domain and create the time/frequency
 % grid.
@@ -25,8 +25,11 @@ cp_type=peak.cp_type;
 freq_fine=peak.freq_fine;
 
 % fc*k_factor is the receiver's actual RX center frequency.
-% k_factor=(fc-peak.freq_fine)/fc;
-k_factor=1;
+if sampling_carrier_twist==1
+    k_factor=(fc-peak.freq_fine)/fc;
+else
+    k_factor=1;
+end
 
 if (strcmpi(cp_type,'normal'))
   n_symb_dl=7;
