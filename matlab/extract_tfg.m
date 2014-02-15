@@ -25,7 +25,8 @@ cp_type=peak.cp_type;
 freq_fine=peak.freq_fine;
 
 % fc*k_factor is the receiver's actual RX center frequency.
-k_factor=(fc-peak.freq_fine)/fc;
+% k_factor=(fc-peak.freq_fine)/fc;
+k_factor=1;
 
 if (strcmpi(cp_type,'normal'))
   n_symb_dl=7;
@@ -58,7 +59,8 @@ for t=1:n_ofdm_sym
   tfg(t,:)=dft(capbuf(indices));
   tfg_timestamp(t)=dft_location;
   if (n_symb_dl==6)
-    dft_location=dft_location+k_factor*(128+16);
+%     dft_location=dft_location+k_factor*(128+16); % wrong?
+    dft_location=dft_location+k_factor*(128+32);
   else
     if (sym_num==6)
       dft_location=dft_location+k_factor*(128+10);

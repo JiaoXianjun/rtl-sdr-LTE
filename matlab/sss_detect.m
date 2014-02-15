@@ -23,10 +23,13 @@ peak_loc=peak.ind;
 peak_freq=peak.freq;
 n_id_2_est=peak.n_id_2;
 
-% fc*k_factor is the receiver's actual RX center frequency.
-k_factor=(fc-peak.freq)/fc;
+% % fc*k_factor is the receiver's actual RX center frequency.
+% k_factor=(fc-peak.freq)/fc;
 
-if (peak_loc+9<163)
+k_factor=1;
+
+if (peak_loc<(480)+32) % TDD
+% if (peak_loc+9<163) % FDD
   peak_loc=peak_loc+9600*k_factor;
 end
 pss_loc_set=peak_loc:9600*k_factor:length(capbuf)-125-9;
@@ -71,7 +74,8 @@ for k=1:n_pss
   pss_np(k)=sigpower(h_sm(k,:)-h_raw(k,:));
 
   % Calculate the SSS in the frequency domain (ext)
-  sss_ext_dft_location=pss_dft_location-128-32;
+  sss_ext_dft_location=pss_dft_location-3*(128+32); % TDD
+%   sss_ext_dft_location=pss_dft_location-128-32; % FDD
   dft_in=fshift(capbuf(sss_ext_dft_location:sss_ext_dft_location+127),-peak_freq,fs_lte/16);
   % TOC
   dft_in=[dft_in(3:end) dft_in(1:2)];
@@ -79,7 +83,8 @@ for k=1:n_pss
   sss_ext_raw(k,1:62)=[dft_out(end-30:end) dft_out(2:32)];
 
   % Calculate the SSS in the frequency domain (nrm)
-  sss_nrm_dft_location=pss_dft_location-128-9;
+  sss_nrm_dft_location=pss_dft_location-412; % TDD
+%   sss_nrm_dft_location=pss_dft_location-128-9; % FDD
   dft_in=fshift(capbuf(sss_nrm_dft_location:sss_nrm_dft_location+127),-peak_freq,fs_lte/16);
   % TOC
   dft_in=[dft_in(3:end) dft_in(1:2)];
@@ -161,7 +166,8 @@ else
 end
 % frame_start is the location of the 'start' of the cp of the frame.
 % The first DFT for the frame should be located at frame_start+cp_length
-frame_start=peak_loc+(128+9-960-2)*k_factor;
+frame_start=peak_loc+(128+9-1920-(3*(128+9)+1)-2)*k_factor; % TDD NORMAL CP
+% frame_start=peak_loc+(128+9-960-2)*k_factor; % FDD
 if (max(log_lik(:,1))>max(log_lik(:,2)))
   ll=log_lik(:,1);
 else

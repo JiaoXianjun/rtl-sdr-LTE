@@ -26,7 +26,8 @@ n_id_2=peak.n_id_2;
 cp_type=peak.cp_type;
 
 % fc*k_factor is the receiver's actual RX center frequency.
-k_factor=(fc-peak.freq_fine)/fc;
+% k_factor=(fc-peak.freq_fine)/fc;
+k_factor=1;
 
 % Second order derivations
 n_ofdm=size(tfg,1);
@@ -107,12 +108,14 @@ for t=1:12
   foe=foe+sum(conj(rs_comp(1:end-1)).*rs_comp(2:end));
 end
 
-residual_f=angle(foe)/(2*pi)/(k_factor*.0005)
+residual_f=angle(foe)/(2*pi)/(k_factor*.0005);
 peak_out.freq_superfine=peak_out.freq_fine+residual_f;
 
 % Perform FOC. This does not compensate for the ICI, only the bulk
 % frequency offset and time shift between OFDM symbols.
-k_factor_residual=(fc-residual_f)/fc;
+% k_factor_residual=(fc-residual_f)/fc;
+k_factor_residual=1;
+
 tfg_comp=NaN(size(tfg));
 tfg_comp_timestamp=1+k_factor_residual*(tfg_timestamp-1);
 cn=[-36:-1 1:36];
@@ -170,7 +173,9 @@ for t=1:length(rs_set)-1
   offsets=fliplr(offsets);
   %keyboard
 end
-delay=-angle(toe)/3/(2*pi/128)
+delay=-angle(toe)/3/(2*pi/128);
+% disp(['residual_f ' num2str(residual_f)]);
+% disp(['delay ' num2str(delay)]);
 
 % Finally, perform TOC.
 tfg_comp=tfg_comp.*repmat(exp((j*2*pi/128*delay)*cn),n_ofdm,1);

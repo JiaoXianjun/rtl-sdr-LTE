@@ -1,0 +1,11 @@
+Cell 1 information:
+              Cell ID: 253
+   Num. eNB Ant ports: 2
+    Carrier frequency: 1890MHz
+Residual freq. offset: -41116.3329Hz
+       RX power level: 11.1699
+              CP type: normal
+              Num. RB: 100
+       PHICH duration: normal
+  PHICH resource type: 0.16667
+ Sampling freq. error: 14.881PPM
