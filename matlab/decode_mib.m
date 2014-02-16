@@ -192,11 +192,7 @@ if (found)
   % PHICH res
   phich_res=c_est(5)*2+c_est(6);
   phich_res_map=[1/6 1/2 1 2];
-  if phich_res
-    peak_out.phich_res=phich_res_map(phich_res);
-  else % for TDD, is can be zero
-    peak_out.phich_res=phich_res;
-  end
+  peak_out.phich_res=phich_res_map(phich_res+1);
 
   % Calculate the SFN of the first frame in the tfg variable.
   sfn_bits=c_est(7:14);
