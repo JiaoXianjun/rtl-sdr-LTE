@@ -1,0 +1,23 @@
+Cell 1 information:
+            Cell mode: FDD
+              Cell ID: 142
+   Num. eNB Ant ports: 2
+    Carrier frequency: 1860MHz
+Residual freq. offset: -41.8006kHz
+       RX power level: -0.90925
+              CP type: normal
+              Num. RB: 100
+       PHICH duration: normal
+  PHICH resource type: 0.5
+ 
+Cell 2 information:
+            Cell mode: FDD
+              Cell ID: 86
+   Num. eNB Ant ports: 2
+    Carrier frequency: 1860MHz
+Residual freq. offset: -41.7744kHz
+       RX power level: -1.1267
+              CP type: normal
+              Num. RB: 100
+       PHICH duration: normal
+  PHICH resource type: 0.5
