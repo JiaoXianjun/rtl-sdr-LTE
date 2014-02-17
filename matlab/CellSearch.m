@@ -1,4 +1,5 @@
 % Jiao Xianjun (putaoshu@msn.com; putaoshu@gmail.com)
+% CellSearch.m
 % Improved LTE-Cell-Scanner (written by James Peroulas: https://github.com/Evrytania/LTE-Cell-Scanner).
 % Add 1) TD-LTE; 2) external mixer (no assumption on relationship between sampling and carrier error) support
 % A script of project: https://github.com/JiaoXianjun/rtl-sdr-LTE
@@ -13,8 +14,8 @@
 clear all;
 close all;
 
-freq_set = [2604.9e6 2605e6 2605.1e6] - 1998e6;
-use_file_flag = 1; % set to 1 to use pre-captured file; set to 0 to use live dongle IQ samples (run "rtl_tcp -p 1234 -d 0" in shell first!)
+freq_set = [2645e6] - 1998e6;
+use_file_flag = 0; % set to 1 to use pre-captured file; set to 0 to use live dongle IQ samples (run "rtl_tcp -p 1234 -d 0" in shell first!)
 % ------------------------------------------------------------------------------------
 rtl_sdr_bin_filename = '../scan-capture/frequency-1850-1880MHz/f1860_s1.92_g0_1s_strong.bin';% 17.3611PPM; -45kHz
 % rtl_sdr_bin_filename = '../scan-capture/frequency-1850-1880MHz/f1860_s1.92_g0_1s.bin'; % 17.3611PPM; -45kHz
