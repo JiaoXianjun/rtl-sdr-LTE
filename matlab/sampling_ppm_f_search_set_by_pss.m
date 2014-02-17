@@ -14,7 +14,7 @@ fo_search_set = -100e3 : 5e3 : 100e3; % -100kHz ~ 100 kHz with 5kHz step size
 pss_fo_set = pss_fo_set_gen(td_pss, fo_search_set);
 
 len = length(s);
-th = 30; %threshold
+th = 20; %threshold
 
 sampling_rate = 1.92e6; % LTE spec. 30.72MHz/16.
 
@@ -75,7 +75,7 @@ sp = time_location(1, max_idx);
 ep = time_location(end, max_idx);
 ppm = 1e6*( (ep-sp) - (pss_period*(pss_count-1)) )./(pss_period*(pss_count-1)); % sampling period PPM! not sampling frequency PPM!
 
-num_reserve = min(1, num_fo);
+num_reserve = min(4, num_fo);
 [~, max_idx] = sort(sum_corr_val, 'descend');
 max_idx = max_idx(1:num_reserve);
 idx_in_fo_search_set = hit_pss_fo_set_idx(max_idx);

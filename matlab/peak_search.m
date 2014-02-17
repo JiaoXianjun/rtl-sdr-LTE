@@ -55,6 +55,7 @@ while (1)
   rec.sfn=NaN;
   rec.n_id_cell=NaN;
   rec.n_ports=NaN;
+  rec.duplex_mode=NaN;
   peaks=[peaks rec];
   % Cancel out certain peaks around this one.
   % It's assumed that if there is a peak for PSS N at offset I, there cannot

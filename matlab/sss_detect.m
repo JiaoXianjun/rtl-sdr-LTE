@@ -215,9 +215,11 @@ if (lik_final<L_mean+sqrt(L_var)*thresh2_n_sigma)
   peak_out.n_id_1=NaN;
   peak_out.cp_type='';
   peak_out.frame_start=NaN;
+  peak_out.duplex_mode=NaN;
 else
   peak_out.n_id_1=n_id_1_est;
   peak_out.cp_type=cp_type_est;
   peak_out.frame_start=frame_start;
+  peak_out.duplex_mode=tdd_flag;
 end
 

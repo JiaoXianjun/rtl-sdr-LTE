@@ -14,7 +14,7 @@ hit_corr_val = zeros(1, max_reserve);
 len = length(s);
 % metric_record = zeros(len - (len_pss-1), num_fo_pss);
 
-len_half_store = 96;
+len_half_store = 128;
 corr_store = zeros(2*len_half_store+1, num_fo_pss);
 end_idx = inf;
 for i=1:(len - (len_pss-1))

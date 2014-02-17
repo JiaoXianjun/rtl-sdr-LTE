@@ -13,7 +13,8 @@
 clear all;
 close all;
 
-% - NOTE! comment out all rtl_sdr_bin_filename to use live data from rtl-sdr dongle --
+freq_set = [2604.9e6 2605e6 2605.1e6] - 1998e6;
+use_file_flag = 1; % set to 1 to use pre-captured file; set to 0 to use live dongle IQ samples (run "rtl_tcp -p 1234 -d 0" in shell first!)
 % ------------------------------------------------------------------------------------
 rtl_sdr_bin_filename = '../scan-capture/frequency-1850-1880MHz/f1860_s1.92_g0_1s_strong.bin';% 17.3611PPM; -45kHz
 % rtl_sdr_bin_filename = '../scan-capture/frequency-1850-1880MHz/f1860_s1.92_g0_1s.bin'; % 17.3611PPM; -45kHz
@@ -35,115 +36,250 @@ rtl_sdr_bin_filename = '../scan-capture/frequency-1850-1880MHz/f1860_s1.92_g0_1s
 % This ensures signal is stable enough.
 % ------------------------------------------------------------------------------------
 
-fc = 1860e6;
-
 % If external mixer (like MMDS LNB) is used, this must be set to 0!
 sampling_carrier_twist = 0; % ATTENTION! If this is 1, make sure fc is aligned with rtl_sdr_bin_filename!!!
+gain = 0; % when external MMDS LNB is used, consider using fixed gain instead of AGC
 
-tdd_flag = 0;
-
-num_radioframe = 8; % each radio frame length 10ms. MIB period is 4 radio frame
+num_radioframe = 16; % each radio frame length 10ms. MIB period is 4 radio frame
 sampling_rate = 1.92e6; % LTE spec. 30.72MHz/16.
 num_subframe_per_radioframe = 10;
 len_time_subframe = 1e-3; % 1ms. LTE spec
 num_sample = num_radioframe*num_subframe_per_radioframe*len_time_subframe*sampling_rate;
+% LTE channle filter for center 6 RB
+coef = fir1(46, (0.18e6*6+16*15e3)/sampling_rate); % freqz(coef, 1, 1024);
+
+DS_COMB_ARM = 2;
+FS_LTE = 30720000;
+thresh1_n_nines=12;
+rx_cutoff=(6*12*15e3/2+4*15e3)/(FS_LTE/16/2);
+THRESH2_N_SIGMA = 3;
 
 [~, td_pss] = pss_gen;
 
-r = read_rtl_sdr_bin2IQ(rtl_sdr_bin_filename, num_sample);
-
-% LTE channle filter for center 6 RB
-coef = fir1(46, (0.18e6*6+16*15e3)/sampling_rate); % freqz(coef, 1, 1024);
-r = filter(coef, 1, r);
-
-f_search_set = [-45e3, -40e3];
-if sampling_carrier_twist == 0
-    [period_ppm, f_search_set] = sampling_ppm_f_search_set_by_pss(r, td_pss);
-    r = sampling_period_correction(r, period_ppm);
+if use_file_flag == 0
+    num_dongle = 1;
+    % check if previous tce objects existed. if so clear them
+    if ~isempty(who('tcp_obj'))
+        for i=1:length(tcp_obj)
+            fclose(tcp_obj{i});
+            delete(tcp_obj{i});
+        end
+        clear tcp_obj;
+    end
+    % construct tcp objects
+    tcp_obj = cell(1, num_dongle);
+    for i=1:num_dongle
+        tcp_obj{i} = tcpip('127.0.0.1', 1233+i); % for dongle i
+    end
+    % set some parameters to tcp objects, and open them.
+    for i=1:num_dongle
+        set(tcp_obj{i}, 'InputBufferSize', 2*num_sample);
+        set(tcp_obj{i}, 'Timeout', 2);
+    end
+    for i=1:num_dongle
+        fopen(tcp_obj{i});
+    end
+    % set gain
+    for i=1:num_dongle
+        set_gain_tcp(tcp_obj{i}, gain*10); %be careful, in rtl_sdr the 10x is done inside C program, but in rtl_tcp the 10x has to be done here.
+    end
+    % set sampling rate
+    for i=1:num_dongle
+        set_rate_tcp(tcp_obj{i}, sampling_rate);
+    end
+    % set different start freq to different dongle
+    for i=1:num_dongle
+        set_freq_tcp(tcp_obj{i}, freq_set(1));
+    end
+    % read and discard to flush
+    for i=1:num_dongle
+        fread(tcp_obj{i}, 2*num_sample, 'uint8');
+    end
 end
 
-% % sampling_ppm = 133.9286;
-% sampling_ppm = 116.4426;
-% % sampling_ppm = 26.2009;
-% % sampling_ppm = 14.881;
-
-capbuf = r.';
-% freq_start = 2e9;
-% ppm = 100;
-% n_extra=floor((freq_start*ppm/1e6+2.5e3)/5e3);
-% f_search_set = (-n_extra*5e3) : 5e3 : (n_extra*5e3);
-% f_search_set = -65e3;
-% f_search_set = -60e3 : 5e3 : -30e3;
-DS_COMB_ARM = 2;
-
-% if isempty(dir('xcorr_pss.mat'))
-    [xc_incoherent_collapsed_pow xc_incoherent_collapsed_frq n_comb_xc n_comb_sp xc_incoherent_single xc_incoherent sp_incoherent xc sp]= ...
-    xcorr_pss(capbuf,f_search_set,DS_COMB_ARM,fc, sampling_carrier_twist);
-%     save xcorr_pss_result.mat xc_incoherent_collapsed_pow xc_incoherent_collapsed_frq n_comb_xc n_comb_sp xc_incoherent_single xc_incoherent sp_incoherent xc sp capbuf f_search_set DS_COMB_ARM fc; 
-% else
-%     load xcorr_pss.mat;
-% end
-
-FS_LTE = 30720000;
-thresh1_n_nines=12;
-R_th1=chi2cdf_inv(1-(10.0^(-thresh1_n_nines)), 2*n_comb_xc*(2*DS_COMB_ARM+1));
-rx_cutoff=(6*12*15e3/2+4*15e3)/(FS_LTE/16/2);
-Z_th1=R_th1*sp_incoherent/rx_cutoff/137/2/n_comb_xc/(2*DS_COMB_ARM+1);
-
-% if isempty(dir('peak_search.mat'))
-    peaks=peak_search(xc_incoherent_collapsed_pow,xc_incoherent_collapsed_frq,Z_th1,f_search_set);
-%     save peak_search.mat peaks xc_incoherent_collapsed_pow xc_incoherent_collapsed_frq Z_th1 f_search_set;
-% else
-%     load peak_search.mat;
-% end
-
-THRESH2_N_SIGMA = 3;
-detect_flag = zeros(1, length(peaks));
-for i=1:length(peaks)
-    peak = peaks(i);
-    [peak sss_h1_np_est sss_h2_np_est sss_h1_nrm_est sss_h2_nrm_est sss_h1_ext_est sss_h2_ext_est]=...
-        sss_detect(peak,capbuf,THRESH2_N_SIGMA,fc,sampling_carrier_twist,tdd_flag);
-    if isnan( peak.n_id_1 )
-        continue;
-    end
-    peak=pss_sss_foe(peak,capbuf,fc,sampling_carrier_twist,tdd_flag);
-    [tfg tfg_timestamp]=extract_tfg(peak,capbuf,fc,sampling_carrier_twist);
-    [tfg_comp tfg_comp_timestamp peak]=tfoec(peak,tfg,tfg_timestamp,fc,sampling_carrier_twist);
-    peak=decode_mib(peak,tfg_comp);
-    if isnan( peak.n_rb_dl)
-        continue;
-    end
-    disp('  Detected a cell!');
-    disp(['    cell ID: ' num2str(peak.n_id_cell)]);
-    disp(['    RX power level: ' num2str(10*log10(peak.pow))]);
-    disp(['    residual frequency offset: ' num2str(peak.freq_superfine)]);
-    peaks(i) = peak;
-    detect_flag(i) = 1;
-end
-
-if sum(detect_flag)
-    hit_idx = find(detect_flag);
-    if tdd_flag == 1
-        cell_mode_str = 'TDD';
-    else
-        cell_mode_str = 'FDD';
-    end
-    for i=1:length(hit_idx);
-        disp(' ');
-        disp(['Cell ' num2str(i) ' information:']);
-        peak = peaks(hit_idx(i));
-        disp(['            Cell mode: ' num2str(cell_mode_str)]);
-        disp(['              Cell ID: ' num2str(peak.n_id_cell)]);
-        disp(['   Num. eNB Ant ports: ' num2str(peak.n_ports)]);
-        disp(['    Carrier frequency: ' num2str(fc/1e6) 'MHz']);
-        disp(['Residual freq. offset: ' num2str(peak.freq_superfine/1e3) 'kHz']);
-        disp(['       RX power level: ' num2str(10*log10(peak.pow))]);
-        disp(['              CP type: ' peak.cp_type]);
-        disp(['              Num. RB: ' num2str(peak.n_rb_dl)]);
-        disp(['       PHICH duration: ' peak.phich_dur]);
-        disp(['  PHICH resource type: ' num2str(peak.phich_res)]);
-%         disp([' Sampling freq. error: ' num2str(ppm_val) 'PPM']);
-    end
+if use_file_flag == 1
+    loop_size = 1;
 else
-    disp('No LTE cells were found...');
+    loop_size = length(freq_set);
+    real_count = zeros(1, num_dongle);
+    s = zeros(2*num_sample, num_dongle);
+    f_search_set = -100e3:5e3:100e3; % default frequency offset searching range if sampling_carrier_twist==1
+end
+peaks_store = cell(1,loop_size);
+detect_flag_store = cell(1,loop_size);
+tdd_flags_store = cell(1,loop_size);
+r_all = zeros(num_sample, loop_size);
+for freq_idx = 1 : loop_size
+    if use_file_flag == 1
+        r = read_rtl_sdr_bin2IQ(rtl_sdr_bin_filename, num_sample);
+        if sampling_carrier_twist==0
+            fc = inf;
+        else
+            fc = 1890e6; % Be careful! This must be aligned with your captured file!
+        end
+    else
+        fc = freq_set(freq_idx);
+        while 1 % read data at current frequency until success
+            for i=1:num_dongle
+                set_freq_tcp(tcp_obj{i}, fc); % set different frequency to different dongle
+            end
+            for i=1:num_dongle
+                fread(tcp_obj{i}, 2*num_sample, 'uint8'); % flush to wait for its stable
+            end
+            for i=1:num_dongle
+                fread(tcp_obj{i}, 2*num_sample, 'uint8'); % flush to wait for its stable
+            end
+            for i=1:num_dongle
+                [s(:, i), real_count(i)] = fread(tcp_obj{i}, 2*num_sample, 'uint8'); % read samples from multi-dongles
+            end
+
+            if sum(real_count-(2*num_sample)) ~= 0
+                disp(num2str([idx 2*num_sample, real_count]));
+            else
+                fid = fopen(['f' num2str(fc/1e6) '_s1.92_g' num2str(gain) '_' num2str(num_sample/sampling_rate) 's.bin'], 'w');
+                fwrite(fid, s(:,1), 'uint8'); % only dongle 1 is stored!
+                fclose(fid);
+                r = raw2iq(s(:,1));
+                break;
+            end
+        end
+    end
+    r_all(:,freq_idx) = r;
+end
+if use_file_flag == 0
+    % close TCP
+    for i=1:num_dongle
+        fclose(tcp_obj{i});
+    end
+    for i=1:num_dongle
+        delete(tcp_obj{i});
+    end
+    clear tcp_obj;
+end
+
+for freq_idx = 1 : loop_size
+    r = r_all(:,freq_idx);
+    r = filter(coef, 1, r);
+    
+    if use_file_flag == 1
+        if sampling_carrier_twist==0
+            fc = inf;
+        else
+            fc = 1890e6; % Be careful! This must be aligned with your captured file!
+        end
+        disp(['Processing  at ' rtl_sdr_bin_filename]);
+    else
+        fc = freq_set(freq_idx);
+        disp(['Processing  at ' num2str(fc/1e6) 'MHz']);
+    end
+
+    if sampling_carrier_twist == 0
+        [period_ppm, f_search_set] = sampling_ppm_f_search_set_by_pss(r, td_pss);
+        if period_ppm == inf
+            disp('No valid PSS is found at pre-proc phase!');
+            peaks = [];
+            detect_flag = [];
+            tdd_flags = [];
+            continue;
+        else
+            r = sampling_period_correction(r, period_ppm);
+        end
+    end
+
+    capbuf = r.';
+    [xc_incoherent_collapsed_pow, xc_incoherent_collapsed_frq, n_comb_xc, n_comb_sp, xc_incoherent_single, xc_incoherent, sp_incoherent, xc, sp]= ...
+    xcorr_pss(capbuf,f_search_set,DS_COMB_ARM,fc, sampling_carrier_twist);
+
+    R_th1=chi2inv(1-(10.0^(-thresh1_n_nines)), 2*n_comb_xc*(2*DS_COMB_ARM+1));
+    Z_th1=R_th1*sp_incoherent/rx_cutoff/137/2/n_comb_xc/(2*DS_COMB_ARM+1);
+
+    peaks=peak_search(xc_incoherent_collapsed_pow,xc_incoherent_collapsed_frq,Z_th1,f_search_set);
+    
+    detect_flag = zeros(1, length(peaks));
+    tdd_flags = zeros(1, length(peaks));
+    for i=1:length(peaks)
+        for tdd_flag=0:1
+            [peak, sss_h1_np_est, sss_h2_np_est, sss_h1_nrm_est, sss_h2_nrm_est, sss_h1_ext_est, sss_h2_ext_est]=...
+                sss_detect(peaks(i),capbuf,THRESH2_N_SIGMA,fc,sampling_carrier_twist,tdd_flag);
+            if ~isnan( peak.n_id_1 )
+                break;
+            end
+        end
+        if isnan( peak.n_id_1 )
+            continue;
+        end
+        peak=pss_sss_foe(peak,capbuf,fc,sampling_carrier_twist,tdd_flag);
+        [tfg, tfg_timestamp]=extract_tfg(peak,capbuf,fc,sampling_carrier_twist);
+        [tfg_comp, tfg_comp_timestamp, peak]=tfoec(peak,tfg,tfg_timestamp,fc,sampling_carrier_twist);
+        peak=decode_mib(peak,tfg_comp);
+        if isnan( peak.n_rb_dl)
+            continue;
+        end
+        if tdd_flag == 1
+            disp('  Detected a TDD cell!');
+        else
+            disp('  Detected a FDD cell!');
+        end
+        if use_file_flag == 1
+            disp(['  at ' rtl_sdr_bin_filename]);
+        else
+            disp(['  at ' num2str(fc/1e6) 'MHz']);
+        end
+        disp(['    cell ID: ' num2str(peak.n_id_cell)]);
+        disp(['    RX power level: ' num2str(10*log10(peak.pow))]);
+        disp(['    residual frequency offset: ' num2str(peak.freq_superfine)]);
+        peaks(i) = peak;
+        detect_flag(i) = 1;
+        tdd_flags(i) = tdd_flag;
+    end
+    peaks_store{freq_idx} = peaks;
+    detect_flag_store{freq_idx} = detect_flag;
+    tdd_flags_store{freq_idx} = tdd_flags;
+    if sum(detect_flag)==0
+        disp('No LTE cells were found...');
+    end
+end
+
+% show all Cells information
+disp(' ');
+disp('-------------------------------Cells information summary-------------------------------');
+for freq_idx = 1 : loop_size
+    if use_file_flag == 1
+        disp(['At ' rtl_sdr_bin_filename]);
+    else
+        fc = freq_set(freq_idx);
+        disp(['At ' num2str(fc/1e6) 'MHz']);
+    end
+    peaks = peaks_store{freq_idx};
+    detect_flag = detect_flag_store{freq_idx};
+    tdd_flags = tdd_flags_store{freq_idx};
+    if isempty(detect_flag)
+        disp('No valid PSS is found at pre-proc phase!');
+    else
+        if sum(detect_flag)
+            hit_idx = find(detect_flag);
+            for i=1:length(hit_idx);
+                peak = peaks(hit_idx(i));
+                tdd_flag = tdd_flags(hit_idx(i));
+                if tdd_flag == 1
+                    cell_mode_str = 'TDD';
+                else
+                    cell_mode_str = 'FDD';
+                end
+                disp(['Cell ' num2str(i) ' information:--------------------------------------------------------']);
+                disp(['            Cell mode: ' num2str(cell_mode_str)]);
+                disp(['              Cell ID: ' num2str(peak.n_id_cell)]);
+                disp(['   Num. eNB Ant ports: ' num2str(peak.n_ports)]);
+                disp(['    Carrier frequency: ' num2str(fc/1e6) 'MHz']);
+                disp(['Residual freq. offset: ' num2str(peak.freq_superfine/1e3) 'kHz']);
+                disp(['       RX power level: ' num2str(10*log10(peak.pow))]);
+                disp(['              CP type: ' peak.cp_type]);
+                disp(['              Num. RB: ' num2str(peak.n_rb_dl)]);
+                disp(['       PHICH duration: ' peak.phich_dur]);
+                disp(['  PHICH resource type: ' num2str(peak.phich_res)]);
+            end
+        else
+            disp('No LTE cells were found...');
+        end
+    end
 end

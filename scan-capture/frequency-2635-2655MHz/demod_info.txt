@@ -1,12 +1,22 @@
-Cell 1 information:
+Cell 1 information:--------------------------------------------------------
+            Cell mode: TDD
               Cell ID: 22
    Num. eNB Ant ports: 2
-    Carrier frequency: 2645MHz
-Residual freq. offset: -89531.0772Hz
-       RX power level: 36.9249
+    Carrier frequency: 647MHz
+Residual freq. offset: -89.3233kHz
+       RX power level: 29.8605
               CP type: normal
               Num. RB: 100
        PHICH duration: normal
-  PHICH resource type: 0.5
- Sampling freq. error: 26.2009PPM
-
+  PHICH resource type: 1
+Cell 2 information:--------------------------------------------------------
+            Cell mode: TDD
+              Cell ID: 21
+   Num. eNB Ant ports: 2
+    Carrier frequency: 647MHz
+Residual freq. offset: -89.3376kHz
+       RX power level: 27.2821
+              CP type: normal
+              Num. RB: 100
+       PHICH duration: normal
+  PHICH resource type: 1
