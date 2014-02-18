@@ -9,3 +9,15 @@ Residual freq. offset: -87975.8941Hz
        PHICH duration: normal
   PHICH resource type: 0
  Sampling freq. error: 26.2009PPM
+
+At 587MHz
+Cell 1 information:--------------------------------------------------------
+            Cell mode: TDD
+              Cell ID: 66
+   Num. eNB Ant ports: 2
+    Carrier frequency: 587MHz
+Residual freq. offset: -88.2294kHz
+       RX power level: 28.9758
+              CP type: normal
+              Num. RB: 100
+       PHICH duration: normal

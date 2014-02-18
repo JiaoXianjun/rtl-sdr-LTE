@@ -14,7 +14,7 @@
 clear all;
 close all;
 
-freq_set = [2645e6] - 1998e6;
+freq_set = [2564.9e6] - 1998e6;
 use_file_flag = 0; % set to 1 to use pre-captured file; set to 0 to use live dongle IQ samples (run "rtl_tcp -p 1234 -d 0" in shell first!)
 % ------------------------------------------------------------------------------------
 rtl_sdr_bin_filename = '../scan-capture/frequency-1850-1880MHz/f1860_s1.92_g0_1s_strong.bin';% 17.3611PPM; -45kHz
