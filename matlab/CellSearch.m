@@ -54,6 +54,7 @@ num_sample_per_radioframe = num_subframe_per_radioframe*len_time_subframe*sampli
 num_sample = num_radioframe*num_sample_per_radioframe;
 % LTE channle filter for center 6 RB
 coef = fir1(46, (0.18e6*6+16*15e3)/sampling_rate); % freqz(coef, 1, 1024);
+% coef = fir1(128, (0.16e6*6)/sampling_rate); % freqz(coef, 1, 1024);
 
 DS_COMB_ARM = 2;
 FS_LTE = 30720000;

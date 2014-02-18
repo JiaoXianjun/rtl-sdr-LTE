@@ -20,6 +20,8 @@ end_idx = inf;
 for i=1:(len - (len_pss-1))
     chn_tmp = s(i:(i+len_pss-1));
     
+%     chn_tmp = chn_tmp - mean(chn_tmp);
+    
     chn_tmp = sqrt(len_pss).*chn_tmp./sqrt( sum(abs(chn_tmp).^2) ); % normalize
     
     tmp = abs(chn_tmp'*pss_fo_set).^2;
