@@ -6,7 +6,7 @@ function [hit_pss_fo_set_idx, hit_time_idx, hit_corr_val] = pss_moving_corr(s, p
 
 len_pss = size(pss_fo_set, 1);
 num_fo_pss = size(pss_fo_set, 2);
-max_reserve = 8;
+max_reserve = 4;
 hit_pss_fo_set_idx = zeros(1, max_reserve);
 hit_time_idx = zeros(1, max_reserve);
 hit_corr_val = zeros(1, max_reserve);

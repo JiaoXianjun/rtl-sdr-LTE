@@ -6,4 +6,5 @@
 function b = raw2iq(a)
 c = a(1:2:end,:) + 1i.*a(2:2:end,:);
 % c = a(2:2:end,:) + 1i.*a(1:2:end,:); % swap
-b = c- kron(ones(size(c,1),1), ( sum(c, 1)./size(c,1) ));
+% b = c- kron(ones(size(c,1),1), ( sum(c, 1)./size(c,1) ));
+b = c - 128 - 1i.*128;

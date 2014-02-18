@@ -14,16 +14,20 @@
 clear all;
 close all;
 
-freq_set = [2564.9e6] - 1998e6;
-use_file_flag = 0; % set to 1 to use pre-captured file; set to 0 to use live dongle IQ samples (run "rtl_tcp -p 1234 -d 0" in shell first!)
+% freq_set = [2564.9e6] - 1998e6;
+freq_set = [2645e6] - 1998e6;
+% freq_set = [2585e6] - 1998e6;
+% freq_set = [2604.9e6] - 1998e6;
+% freq_set = 1890e6;
+use_file_flag = 1; % set to 1 to use pre-captured file; set to 0 to use live dongle IQ samples (run "rtl_tcp -p 1234 -d 0" in shell first!)
 % ------------------------------------------------------------------------------------
-rtl_sdr_bin_filename = '../scan-capture/frequency-1850-1880MHz/f1860_s1.92_g0_1s_strong.bin';% 17.3611PPM; -45kHz
+% rtl_sdr_bin_filename = '../scan-capture/frequency-1850-1880MHz/f1860_s1.92_g0_1s_strong.bin';% 17.3611PPM; -45kHz
 % rtl_sdr_bin_filename = '../scan-capture/frequency-1850-1880MHz/f1860_s1.92_g0_1s.bin'; % 17.3611PPM; -45kHz
 % rtl_sdr_bin_filename = '../scan-capture/frequency-1880-1900MHz/f1890_s1.92_g0_1s.bin'; % -40kHz, 14.881ppm
 % rtl_sdr_bin_filename = '../scan-capture/frequency-2555-2575MHz/f2564.9_s1.92_g0_1s.bin'; % -35kHz, 116.4426PPM
 % rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz-know-PPM/f2645_s1.92_g0_SamplingPPM26.2_1s.bin'; % -89531.0772Hz, 26.2009PPM
 % rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz-know-PPM/f2645_s1.92_g20_SamplingPPM26.2_1s.bin'; % -89531.0772Hz, 26.2009PPM
-% rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz/f2645_s1.92_g0_1s.bin'; % -89531.0772Hz, 26.2009PPM
+rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz/f2645_s1.92_g0_1s.bin'; % -89531.0772Hz, 26.2009PPM
 % rtl_sdr_bin_filename = '../scan-capture/frequency-2575-2595MHz/f2585_s1.92_g0_1s.bin'; % -87975.8941Hz, 26.2009PPM
 % rtl_sdr_bin_filename = '../scan-capture/frequency-2595-2615MHz/f2605_s1.92_g0_1s.bin'; % -65kHz, 116.4426PPM
 % Bin file can be captured by rtl_sdr:
@@ -40,12 +44,14 @@ rtl_sdr_bin_filename = '../scan-capture/frequency-1850-1880MHz/f1860_s1.92_g0_1s
 % If external mixer (like MMDS LNB) is used, this must be set to 0!
 sampling_carrier_twist = 0; % ATTENTION! If this is 1, make sure fc is aligned with rtl_sdr_bin_filename!!!
 gain = 0; % when external MMDS LNB is used, consider using fixed gain instead of AGC
+% gain = 49.6; %seems that a fixed high gain is better
 
-num_radioframe = 16; % each radio frame length 10ms. MIB period is 4 radio frame
+num_radioframe = 8; % each radio frame length 10ms. MIB period is 4 radio frame
 sampling_rate = 1.92e6; % LTE spec. 30.72MHz/16.
 num_subframe_per_radioframe = 10;
 len_time_subframe = 1e-3; % 1ms. LTE spec
-num_sample = num_radioframe*num_subframe_per_radioframe*len_time_subframe*sampling_rate;
+num_sample_per_radioframe = num_subframe_per_radioframe*len_time_subframe*sampling_rate;
+num_sample = num_radioframe*num_sample_per_radioframe;
 % LTE channle filter for center 6 RB
 coef = fir1(46, (0.18e6*6+16*15e3)/sampling_rate); % freqz(coef, 1, 1024);
 
@@ -158,8 +164,13 @@ if use_file_flag == 0
     clear tcp_obj;
 end
 
+plot(real(r)); drawnow;
+
 for freq_idx = 1 : loop_size
     r = r_all(:,freq_idx);
+    
+    disp(['Input averaged abs: ' num2str( mean(abs([real(r); imag(r)])) )]);
+
     r = filter(coef, 1, r);
     
     if use_file_flag == 1
@@ -175,9 +186,10 @@ for freq_idx = 1 : loop_size
     end
 
     if sampling_carrier_twist == 0
+        disp('sampling_ppm_f_search_set_by_pss: try ... ... ');
         [period_ppm, f_search_set] = sampling_ppm_f_search_set_by_pss(r, td_pss);
         if period_ppm == inf
-            disp('No valid PSS is found at pre-proc phase!');
+            disp('No valid PSS is found at pre-proc phase! Please try again.');
             peaks = [];
             detect_flag = [];
             tdd_flags = [];
@@ -185,6 +197,12 @@ for freq_idx = 1 : loop_size
         else
             r = sampling_period_correction(r, period_ppm);
         end
+%         [period_ppm, f_search_set] = sampling_ppm_f_search_set_by_pss(r, td_pss);
+%         r = sampling_period_correction(r, period_ppm);
+%         [period_ppm, f_search_set] = sampling_ppm_f_search_set_by_pss(r, td_pss);
+%         r = sampling_period_correction(r, period_ppm);
+%         [period_ppm, f_search_set] = sampling_ppm_f_search_set_by_pss(r, td_pss);
+%         r = sampling_period_correction(r, period_ppm);
     end
 
     capbuf = r.';
@@ -255,7 +273,7 @@ for freq_idx = 1 : loop_size
     detect_flag = detect_flag_store{freq_idx};
     tdd_flags = tdd_flags_store{freq_idx};
     if isempty(detect_flag)
-        disp('No valid PSS is found at pre-proc phase!');
+        disp('No valid PSS is found at pre-proc phase! Please try again.');
     else
         if sum(detect_flag)
             hit_idx = find(detect_flag);
@@ -280,7 +298,7 @@ for freq_idx = 1 : loop_size
                 disp(['  PHICH resource type: ' num2str(peak.phich_res)]);
             end
         else
-            disp('No LTE cells were found...');
+            disp('No LTE cells were found...  Please try again.');
         end
     end
 end
