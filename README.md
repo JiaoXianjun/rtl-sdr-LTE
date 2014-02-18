@@ -53,6 +53,7 @@ Please join me if you are also interested in this. Please see TODO firstly.
 News
 =======================
 2014-01-19:
+
 CellSearch.m works for both TDD and FDD mode under both with LNB and without LNB.
 
 2014-01-07:
@@ -61,6 +62,12 @@ PSS has been detected successfully at frequency 2645MHz! See comments in matlab/
 
 Usage
 =======================
+2014-01-19:
+
+Make sure your rtl-sdr dongle works fine (http://sdr.osmocom.org/trac/wiki/rtl-sdr). Then run "rtl_tcp -p 1234 -d 0" in shell. Then: 
+
+CellSearch.m (Open it. See comments. And try!)
+
 2014-01-07:
 
 --test_td_lte_pss.m
