@@ -1,4 +1,4 @@
-% Jiao Xianjun (putaoshu@msn.com; putaoshu@gmail.com)
+% Jiao Xianjun (putaoshu@gmail.com; putaoshu@msn.com)
 % CellSearch.m
 % Improved LTE-Cell-Scanner (written by James Peroulas: https://github.com/Evrytania/LTE-Cell-Scanner).
 % Add 1) TD-LTE; 2) external mixer (no assumption on relationship between sampling and carrier error) support
@@ -14,12 +14,17 @@
 clear all;
 close all;
 
+% Change the frequency set as you wish, if rtl-sdr dongle is used.
+% If a MMDS LNB is cascaded with dongle, don't forget to substract LNB LO
+% frequency. My LNB LO is 1998MHz
 % freq_set = [2564.9e6] - 1998e6;
 freq_set = [2645e6] - 1998e6;
 % freq_set = [2585e6] - 1998e6;
 % freq_set = [2604.9e6] - 1998e6;
 % freq_set = 1890e6;
-use_file_flag = 1; % set to 1 to use pre-captured file; set to 0 to use live dongle IQ samples (run "rtl_tcp -p 1234 -d 0" in shell first!)
+
+% set to 1 to use pre-captured file; set to 0 to use live dongle IQ samples (run "rtl_tcp -p 1234 -d 0" in shell first!)
+use_file_flag = 1; 
 % ------------------------------------------------------------------------------------
 % rtl_sdr_bin_filename = '../scan-capture/frequency-1850-1880MHz/f1860_s1.92_g0_1s_strong.bin';% 17.3611PPM; -45kHz
 % rtl_sdr_bin_filename = '../scan-capture/frequency-1850-1880MHz/f1860_s1.92_g0_1s.bin'; % 17.3611PPM; -45kHz
@@ -30,7 +35,11 @@ rtl_sdr_bin_filename = '../scan-capture/frequency-1880-1900MHz/f1890_s1.92_g0_1s
 % rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz/f2645_s1.92_g0_1s.bin'; % -89531.0772Hz, 26.2009PPM
 % rtl_sdr_bin_filename = '../scan-capture/frequency-2575-2595MHz/f2585_s1.92_g0_1s.bin'; % -87975.8941Hz, 26.2009PPM
 % rtl_sdr_bin_filename = '../scan-capture/frequency-2595-2615MHz/f2605_s1.92_g0_1s.bin'; % -65kHz, 116.4426PPM
-% Bin file can be captured by rtl_sdr:
+
+% % !!! Actually each time run with rtl-sdr dongle, this script saves a bin
+% % file automatically!!!
+
+% Bin file can also be captured by rtl_sdr:
 % rtl_sdr -f 900e6 -s 1.92e6 -n 1.92e6 tmp.bin
 % -f 900MHz
 % -s 1.92MHz sampling rate

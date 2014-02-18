@@ -41,12 +41,20 @@ I think it maybe because relative time location of PSS and SSS is different in T
 
 Inspired by James Peroulas, initial exploration with only PSS correlation is done on captured IQ data, and valid PSS has been seen there! (Try it with matlab/test_td_lte_pss.m)
 
-Now TD-LTE signal is identified successfully, maybe adding TD-LTE support to LTE-Cell-Scanner is a good idea.
+Now TD-LTE signal is identified successfully, maybe adding TD-LTE support to LTE-Cell-Scanner is a good idea (Done! See: https://github.com/JiaoXianjun/LTE-Cell-Scanner).
+
+But now LTE-Cell-Scanner only works for situation where there isn't MMDS LNB, because LTE-Cell-Scanner assumes analytic relationship between carrier and sampling frequency.
+When there is external LNB, the relationship won't be maintained anymore. I offer a work around. A module sampling_ppm_f_search_set_by_pss.m is used to do 
+sampling frequency estimation and compensation. Thus LTE-Cell-Scanner can work only for uncertain carrier frequency (By setting k_factor to constant 1). By this way 
+the whole scanner drops analytic relationship between carrier and sampling frequency. See CellSearch.m for detailed informaiton. 
 
 Please join me if you are also interested in this. Please see TODO firstly.
 
 News
 =======================
+2014-01-19:
+CellSearch.m works for both TDD and FDD mode under both with LNB and without LNB.
+
 2014-01-07:
 
 PSS has been detected successfully at frequency 2645MHz! See comments in matlab/test_td_lte_pss.m, and then run it.
