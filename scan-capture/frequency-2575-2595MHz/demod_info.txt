@@ -1,3 +1,14 @@
+Cell 1 information:--------------------------------------------------------
+            Cell mode: TDD
+              Cell ID: 67
+   Num. eNB Ant ports: 2
+    Carrier frequency: InfMHz
+Residual freq. offset: -94.2675kHz
+       RX power level: 31.1485
+              CP type: normal
+              Num. RB: 100
+       PHICH duration: normal
+  PHICH resource type: 0.16667
 Cell 1 information:
               Cell ID: 68
    Num. eNB Ant ports: 2

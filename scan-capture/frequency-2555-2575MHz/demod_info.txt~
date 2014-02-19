@@ -1,17 +1,6 @@
 At 567MHz
 Cell 1 information:--------------------------------------------------------
             Cell mode: TDD
-              Cell ID: 29
-   Num. eNB Ant ports: 2
-    Carrier frequency: InfMHz
-Residual freq. offset: -36.1428kHz
-       RX power level: 34.8551
-              CP type: normal
-              Num. RB: 100
-       PHICH duration: normal
-  PHICH resource type: 1
-Cell 1 information:--------------------------------------------------------
-            Cell mode: TDD
               Cell ID: 28
    Num. eNB Ant ports: 2
     Carrier frequency: 567MHz

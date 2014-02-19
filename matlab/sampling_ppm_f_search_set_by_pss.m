@@ -10,7 +10,7 @@ len_pss = size(td_pss, 1);
 ppm = inf;
 f_set = inf;
 
-fo_search_set = -100e3 : 5e3 : 100e3; % -100kHz ~ 100 kHz with 5kHz step size
+fo_search_set = -100e3 : 1e3 : 100e3; % -100kHz ~ 100 kHz with 5kHz step size
 pss_fo_set = pss_fo_set_gen(td_pss, fo_search_set);
 
 len = length(s);
@@ -23,7 +23,7 @@ num_subframe_per_radioframe = 10;
 num_sample_per_subframe = len_time_subframe*sampling_rate;
 num_sample_per_radioframe = num_sample_per_subframe*num_subframe_per_radioframe;
 
-[hit_pss_fo_set_idx, hit_time_idx, corr_val] = pss_moving_corr(s(1:4*num_sample_per_radioframe), pss_fo_set, th);
+[hit_pss_fo_set_idx, hit_time_idx, corr_val] = pss_moving_corr(s(1:(2*num_sample_per_radioframe)), pss_fo_set, th);
 % disp(num2str(hit_pss_fo_set_idx));
 % disp(num2str(hit_time_idx));
 

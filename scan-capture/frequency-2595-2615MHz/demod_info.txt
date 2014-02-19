@@ -1,0 +1,14 @@
+
+
+At 606.9MHz
+Cell 1 information:--------------------------------------------------------
+            Cell mode: TDD
+              Cell ID: 355
+   Num. eNB Ant ports: 2
+    Carrier frequency: 606.9MHz
+Residual freq. offset: 4.905kHz
+       RX power level: 34.416
+              CP type: normal
+              Num. RB: 100
+       PHICH duration: normal
+  PHICH resource type: 1
