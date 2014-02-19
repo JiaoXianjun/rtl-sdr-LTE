@@ -3,6 +3,10 @@ rtl-sdr-LTE
 
 Play with LTE signal captured by rtl-sdr.
 
+Introduction video(inside China): http://v.youku.com/v_show/id_XNjc1MjIzMDEy.html
+
+Introduction video(outside China): http://www.youtube.com/watch?v=4zRLgxzn4Pc
+
 By a enthusiast <putaoshu@msn.com> <putaoshu@gmail.com> of Software Defined Radio.
 
 Some files are borrowed from https://github.com/Evrytania/LTE-Cell-Scanner, https://github.com/Evrytania/Matlab-Library and https://github.com/JiaoXianjun/multi-rtl-sdr-calibration
