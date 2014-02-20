@@ -4,6 +4,7 @@
 
 function [hit_time_idx, max_val] = pss_fix_location_corr(s, i_set, pss_fo_set, hit_pss_fo_set_idx)
 len_pss = size(pss_fo_set, 1);
+pss_fo_specific_set = pss_fo_set(:, hit_pss_fo_set_idx);
 
 sp = i_set(1);
 ep = i_set(2) + len_pss - 1;
@@ -11,9 +12,9 @@ r = lin2col_shift_mat(s(sp:ep), len_pss);
 
 % r = r - kron( ones(len_pss,1), mean(r, 1) );
 
-r = sqrt(len_pss).*r./kron( ones(len_pss,1), sqrt( sum(abs(r).^2, 1) ) ); % normalize
+% dbgtmp = abs(r'*pss_fo_specific_set).^2;
 
-pss_fo_specific_set = pss_fo_set(:, hit_pss_fo_set_idx);
+r = sqrt(len_pss).*r./kron( ones(len_pss,1), sqrt( sum(abs(r).^2, 1) ) ); % normalize
 
 corr_val = abs(r'*pss_fo_specific_set).^2;
 

@@ -34,11 +34,11 @@ use_file_flag = 1;
 % rtl_sdr_bin_filename = '../scan-capture/frequency-2555-2575MHz/f2564.9_s1.92_g0_1s.bin'; % -35kHz, 116.4426PPM
 % rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz-know-PPM/f2645_s1.92_g0_SamplingPPM26.2_1s.bin'; % -89531.0772Hz, 26.2009PPM
 % rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz-know-PPM/f2645_s1.92_g20_SamplingPPM26.2_1s.bin'; % -89531.0772Hz, 26.2009PPM
-rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz/f2645_s1.92_g0_1s.bin'; % -89531.0772Hz, 26.2009PPM
+% rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz/f2645_s1.92_g0_1s.bin'; % -89531.0772Hz, 26.2009PPM
 % rtl_sdr_bin_filename = '../scan-capture/frequency-2575-2595MHz/f2585_s1.92_g0_0.8s.bin'; % -87975.8941Hz, 26.2009PPM
 % rtl_sdr_bin_filename = '../scan-capture/frequency-2575-2595MHz/f2585_s1.92_g0_1s.bin'; % -87975.8941Hz, 26.2009PPM
 % rtl_sdr_bin_filename = '../scan-capture/frequency-2595-2615MHz/f2604.9_s1.92_g0_0.8s.bin'; % -65kHz, 116.4426PPM
-% rtl_sdr_bin_filename = '../scan-capture/frequency-2595-2615MHz/f2605_s1.92_g0_1s.bin'; % -65kHz, 116.4426PPM
+rtl_sdr_bin_filename = '../scan-capture/frequency-2595-2615MHz/f2605_s1.92_g0_1s.bin'; % -65kHz, 116.4426PPM
 
 % % !!! Actually each time run with rtl-sdr dongle, this script saves a bin
 % % file automatically!!!

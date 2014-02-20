@@ -57,6 +57,7 @@ while 1
     i_set = [min_next_location-max_offset, max_next_location+max_offset];
 
     [hit_time_idx, corr_val] = pss_fix_location_corr(s, i_set, pss_fo_set, hit_pss_fo_set_idx);
+%     plot(dbgtmp);
     
     pss_count = pss_count + 1;
     time_location(pss_count,:) = hit_time_idx;
