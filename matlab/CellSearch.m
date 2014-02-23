@@ -227,13 +227,14 @@ for freq_idx = 1 : loop_size
                 tdd_flags = [];
                 continue;
             else
-                r = sampling_period_correction(r, period_ppm);
+%                 r = sampling_period_correction(r, period_ppm); k_factor=1;
+                k_factor=(1+period_ppm*1e-6);
             end
         end
 
         capbuf = r.';
         [xc_incoherent_collapsed_pow, xc_incoherent_collapsed_frq, n_comb_xc, n_comb_sp, xc_incoherent_single, xc_incoherent, sp_incoherent, xc, sp]= ...
-        xcorr_pss(capbuf,f_search_set,DS_COMB_ARM,fc, sampling_carrier_twist);
+        xcorr_pss(capbuf,f_search_set,DS_COMB_ARM,fc,sampling_carrier_twist,k_factor);
 
         R_th1=chi2inv(1-(10.0^(-thresh1_n_nines)), 2*n_comb_xc*(2*DS_COMB_ARM+1));
         Z_th1=R_th1*sp_incoherent/rx_cutoff/137/2/n_comb_xc/(2*DS_COMB_ARM+1);
@@ -244,8 +245,7 @@ for freq_idx = 1 : loop_size
         tdd_flags = zeros(1, length(peaks));
         for i=1:length(peaks)
             for tdd_flag=0:1
-                [peak, sss_h1_np_est, sss_h2_np_est, sss_h1_nrm_est, sss_h2_nrm_est, sss_h1_ext_est, sss_h2_ext_est]=...
-                    sss_detect(peaks(i),capbuf,THRESH2_N_SIGMA,fc,sampling_carrier_twist,tdd_flag);
+                peak = sss_detect(peaks(i),capbuf,THRESH2_N_SIGMA,fc,sampling_carrier_twist,k_factor,tdd_flag);
                 if ~isnan( peak.n_id_1 )
                     break;
                 end
@@ -253,9 +253,9 @@ for freq_idx = 1 : loop_size
             if isnan( peak.n_id_1 )
                 continue;
             end
-            peak=pss_sss_foe(peak,capbuf,fc,sampling_carrier_twist,tdd_flag);
-            [tfg, tfg_timestamp]=extract_tfg(peak,capbuf,fc,sampling_carrier_twist);
-            [tfg_comp, tfg_comp_timestamp, peak]=tfoec(peak,tfg,tfg_timestamp,fc,sampling_carrier_twist);
+            peak=pss_sss_foe(peak,capbuf,fc,sampling_carrier_twist,k_factor,tdd_flag);
+            [tfg, tfg_timestamp]=extract_tfg(peak,capbuf,fc,sampling_carrier_twist,k_factor);
+            [tfg_comp, tfg_comp_timestamp, peak]=tfoec(peak,tfg,tfg_timestamp,fc,sampling_carrier_twist,k_factor);
             peak=decode_mib(peak,tfg_comp);
             if isnan( peak.n_rb_dl)
                 continue;

@@ -1,4 +1,4 @@
-function peak_out=pss_sss_foe(peak,capbuf,fc,sampling_carrier_twist,tdd_flag)
+function peak_out=pss_sss_foe(peak,capbuf,fc,sampling_carrier_twist,k_factor,tdd_flag)
 
 % Use (only) the PSS and SSS to calculate the frequency offset.
 
@@ -22,8 +22,8 @@ function peak_out=pss_sss_foe(peak,capbuf,fc,sampling_carrier_twist,tdd_flag)
 % fc*k_factor is the receiver's actual RX center frequency.
 if sampling_carrier_twist==1
     k_factor=(fc-peak.freq)/fc;
-else
-    k_factor=1;
+% else
+%     k_factor=1;
 end
 
 %%%%%%

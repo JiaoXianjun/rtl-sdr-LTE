@@ -1,5 +1,4 @@
-function [peak_out sss_h1_np_est sss_h2_np_est sss_h1_nrm_est sss_h2_nrm_est sss_h1_ext_est sss_h2_ext_est]= ...
-    sss_detect(peak,capbuf,thresh2_n_sigma,fc,sampling_carrier_twist,tdd_flag)
+function peak_out = sss_detect(peak,capbuf,thresh2_n_sigma,fc,sampling_carrier_twist,k_factor,tdd_flag)
 
 % Perform maximum likelihood estimation of the SSS.
 
@@ -27,19 +26,25 @@ n_id_2_est=peak.n_id_2;
 % % fc*k_factor is the receiver's actual RX center frequency.
 if sampling_carrier_twist==1
     k_factor=(fc-peak.freq)/fc;
-else
-    k_factor=1;
+% else
+%     k_factor=1;
 end
 
 if tdd_flag == 1
     min_idx = 3*(128+32)+32;
+    sss_ext_offset = 3*(128+32);
+    sss_nrm_offset = 412;
 else
     min_idx = 163-9;
+    sss_ext_offset = 128+32;
+    sss_nrm_offset = 128+9;
 end
 if (peak_loc<min_idx) % TDD
   peak_loc=peak_loc+9600*k_factor;
 end
 pss_loc_set=peak_loc:9600*k_factor:length(capbuf)-125-9;
+% pss_loc_set=peak_loc + (0:9600:7*9600);
+% pss_loc_set=peak_loc + (8*9600:9600:15*9600);
 n_pss=length(pss_loc_set);
 pss_np=NaN(1,n_pss);
 h_raw=NaN(n_pss,62);
@@ -81,11 +86,7 @@ for k=1:n_pss
   pss_np(k)=sigpower(h_sm(k,:)-h_raw(k,:));
 
   % Calculate the SSS in the frequency domain (ext)
-  if tdd_flag == 1
-    sss_ext_dft_location=pss_dft_location-3*(128+32); % TDD
-  else
-    sss_ext_dft_location=pss_dft_location-128-32; % FDD
-  end
+  sss_ext_dft_location=pss_dft_location-sss_ext_offset;
   dft_in=fshift(capbuf(sss_ext_dft_location:sss_ext_dft_location+127),-peak_freq,fs_lte/16);
   % TOC
   dft_in=[dft_in(3:end) dft_in(1:2)];
@@ -93,34 +94,64 @@ for k=1:n_pss
   sss_ext_raw(k,1:62)=[dft_out(end-30:end) dft_out(2:32)];
 
   % Calculate the SSS in the frequency domain (nrm)
-  if tdd_flag == 1
-    sss_nrm_dft_location=pss_dft_location-412; % TDD
-  else
-    sss_nrm_dft_location=pss_dft_location-128-9; % FDD
-  end
+  sss_nrm_dft_location=pss_dft_location-sss_nrm_offset;
   dft_in=fshift(capbuf(sss_nrm_dft_location:sss_nrm_dft_location+127),-peak_freq,fs_lte/16);
   % TOC
   dft_in=[dft_in(3:end) dft_in(1:2)];
   dft_out=dft(dft_in);
   sss_nrm_raw(k,1:62)=[dft_out(end-30:end) dft_out(2:32)];
 end
+
+% % interpolation along time to get accurate response at sss.
+% h_sm_ext_interp = zeros(n_pss, 62);
+% h_sm_nrm_interp = zeros(n_pss, 62);
+% for t=1:62
+%     h_sm_ext_interp(:,t) = interp1(pss_loc_set, h_sm(:,t), pss_loc_set-sss_ext_offset, 'linear','extrap');
+%     h_sm_nrm_interp(:,t) = interp1(pss_loc_set, h_sm(:,t), pss_loc_set-sss_nrm_offset, 'linear','extrap');
+% end
+% 
+% h_raw_ext_interp = zeros(n_pss, 62);
+% h_raw_nrm_interp = zeros(n_pss, 62);
+% for t=1:62
+%     h_raw_ext_interp(:,t) = interp1(pss_loc_set, h_raw(:,t), pss_loc_set-sss_ext_offset, 'linear','extrap');
+%     h_raw_nrm_interp(:,t) = interp1(pss_loc_set, h_raw(:,t), pss_loc_set-sss_nrm_offset, 'linear','extrap');
+% end
+% 
+% pss_np_ext=zeros(1,n_pss);
+% pss_np_nrm=zeros(1,n_pss);
+% for k=1:n_pss
+%     pss_np_ext(k)=sigpower(h_sm_ext_interp(k,:)-h_raw_ext_interp(k,:));
+%     pss_np_nrm(k)=sigpower(h_sm_nrm_interp(k,:)-h_raw_nrm_interp(k,:));
+% end
+
+% ----recover original algorithm by using following 4 lines
+h_sm_ext_interp = h_sm;
+h_sm_nrm_interp = h_sm;
+pss_np_ext = pss_np;
+pss_np_nrm = pss_np;
+
 % Combine results from different slots
-sss_h1_np_est=NaN(1,62);
-sss_h2_np_est=NaN(1,62);
+sss_h1_nrm_np_est=NaN(1,62);
+sss_h2_nrm_np_est=NaN(1,62);
+sss_h1_ext_np_est=NaN(1,62);
+sss_h2_ext_np_est=NaN(1,62);
 
 sss_h1_nrm_est=NaN(1,62);
 sss_h2_nrm_est=NaN(1,62);
 sss_h1_ext_est=NaN(1,62);
 sss_h2_ext_est=NaN(1,62);
 for t=1:62
-  sss_h1_np_est(t)=real((1+ctranspose(h_sm(1:2:end,t))*diag(1./pss_np(1:2:end))*h_sm(1:2:end,t))^-1);
-  sss_h2_np_est(t)=real((1+ctranspose(h_sm(2:2:end,t))*diag(1./pss_np(2:2:end))*h_sm(2:2:end,t))^-1);
+  sss_h1_nrm_np_est(t)=real((1+ctranspose(h_sm_nrm_interp(1:2:end,t))*diag(1./pss_np_nrm(1:2:end))*h_sm_nrm_interp(1:2:end,t))^-1);
+  sss_h2_nrm_np_est(t)=real((1+ctranspose(h_sm_nrm_interp(2:2:end,t))*diag(1./pss_np_nrm(2:2:end))*h_sm_nrm_interp(2:2:end,t))^-1);
 
-  sss_h1_nrm_est(t)=sss_h1_np_est(t)*ctranspose(h_sm(1:2:end,t))*diag(1./pss_np(1:2:end))*sss_nrm_raw(1:2:end,t);
-  sss_h2_nrm_est(t)=sss_h2_np_est(t)*ctranspose(h_sm(2:2:end,t))*diag(1./pss_np(2:2:end))*sss_nrm_raw(2:2:end,t);
+  sss_h1_ext_np_est(t)=real((1+ctranspose(h_sm_ext_interp(1:2:end,t))*diag(1./pss_np_ext(1:2:end))*h_sm_ext_interp(1:2:end,t))^-1);
+  sss_h2_ext_np_est(t)=real((1+ctranspose(h_sm_ext_interp(2:2:end,t))*diag(1./pss_np_ext(2:2:end))*h_sm_ext_interp(2:2:end,t))^-1);
 
-  sss_h1_ext_est(t)=sss_h1_np_est(t)*ctranspose(h_sm(1:2:end,t))*diag(1./pss_np(1:2:end))*sss_ext_raw(1:2:end,t);
-  sss_h2_ext_est(t)=sss_h2_np_est(t)*ctranspose(h_sm(2:2:end,t))*diag(1./pss_np(2:2:end))*sss_ext_raw(2:2:end,t);
+  sss_h1_nrm_est(t)=sss_h1_nrm_np_est(t)*ctranspose(h_sm_nrm_interp(1:2:end,t))*diag(1./pss_np_nrm(1:2:end))*sss_nrm_raw(1:2:end,t);
+  sss_h2_nrm_est(t)=sss_h2_nrm_np_est(t)*ctranspose(h_sm_nrm_interp(2:2:end,t))*diag(1./pss_np_nrm(2:2:end))*sss_nrm_raw(2:2:end,t);
+
+  sss_h1_ext_est(t)=sss_h1_ext_np_est(t)*ctranspose(h_sm_ext_interp(1:2:end,t))*diag(1./pss_np_ext(1:2:end))*sss_ext_raw(1:2:end,t);
+  sss_h2_ext_est(t)=sss_h2_ext_np_est(t)*ctranspose(h_sm_ext_interp(2:2:end,t))*diag(1./pss_np_ext(2:2:end))*sss_ext_raw(2:2:end,t);
 end
 
 % Maximum likelihood detection of SSS
@@ -135,7 +166,7 @@ for t=0:167
   sss_h1_try=sss_h1_try*exp(j*-ang);
   sss_h2_try=sss_h2_try*exp(j*-ang);
   df=[sss_h1_try sss_h2_try]-[sss_h1_nrm_est sss_h2_nrm_est];
-  log_lik_nrm(t+1,1)=sum(-[real(df) imag(df)].^2./repmat([sss_h1_np_est sss_h2_np_est],1,2));
+  log_lik_nrm(t+1,1)=sum(-[real(df) imag(df)].^2./repmat([sss_h1_nrm_np_est sss_h2_nrm_np_est],1,2));
 
   % Exchange h1 and h2 and re-do
   temp=sss_h1_try;
@@ -145,7 +176,7 @@ for t=0:167
   sss_h1_try=sss_h1_try*exp(j*-ang);
   sss_h2_try=sss_h2_try*exp(j*-ang);
   df=[sss_h1_try sss_h2_try]-[sss_h1_nrm_est sss_h2_nrm_est];
-  log_lik_nrm(t+1,2)=sum(-[real(df) imag(df)].^2./repmat([sss_h1_np_est sss_h2_np_est],1,2));
+  log_lik_nrm(t+1,2)=sum(-[real(df) imag(df)].^2./repmat([sss_h1_nrm_np_est sss_h2_nrm_np_est],1,2));
 
   % Re-do for extended prefix
   % Rotate the candiate sequence to match the received sequence.
@@ -156,7 +187,7 @@ for t=0:167
   sss_h1_try=sss_h1_try*exp(j*-ang);
   sss_h2_try=sss_h2_try*exp(j*-ang);
   df=[sss_h1_try sss_h2_try]-[sss_h1_ext_est sss_h2_ext_est];
-  log_lik_ext(t+1,1)=sum(-[real(df) imag(df)].^2./repmat([sss_h1_np_est sss_h2_np_est],1,2));
+  log_lik_ext(t+1,1)=sum(-[real(df) imag(df)].^2./repmat([sss_h1_ext_np_est sss_h2_ext_np_est],1,2));
 
   % Exchange h1 and h2 and re-do
   temp=sss_h1_try;
@@ -166,7 +197,7 @@ for t=0:167
   sss_h1_try=sss_h1_try*exp(j*-ang);
   sss_h2_try=sss_h2_try*exp(j*-ang);
   df=[sss_h1_try sss_h2_try]-[sss_h1_ext_est sss_h2_ext_est];
-  log_lik_ext(t+1,2)=sum(-[real(df) imag(df)].^2./repmat([sss_h1_np_est sss_h2_np_est],1,2));
+  log_lik_ext(t+1,2)=sum(-[real(df) imag(df)].^2./repmat([sss_h1_ext_np_est sss_h2_ext_np_est],1,2));
 end
 
 %warning('Check code here!!!!');
