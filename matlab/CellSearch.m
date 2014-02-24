@@ -124,7 +124,6 @@ else
     loop_size = length(freq_set);
     real_count = zeros(1, num_dongle);
     s = zeros(2*num_sample, num_dongle);
-    f_search_set = -100e3:5e3:100e3; % default frequency offset searching range if sampling_carrier_twist==1
 end
 peaks_store = cell(1,loop_size);
 detect_flag_store = cell(1,loop_size);
@@ -146,7 +145,7 @@ for freq_idx = 1 : loop_size
         if sampling_carrier_twist==0
             fc = inf;
         else
-            fc = 1890e6; % Be careful! This must be aligned with your captured file!
+            fc = 1860e6; % Be careful! This must be aligned with your captured file!
         end
     else
         fc = freq_set(freq_idx);
@@ -217,6 +216,8 @@ for freq_idx = 1 : loop_size
             disp(['Processing  at ' num2str(fc/1e6) 'MHz']);
         end
 
+        f_search_set = -100e3:5e3:100e3; % default frequency offset searching range if sampling_carrier_twist==1
+        k_factor = 1;
         if sampling_carrier_twist == 0
             disp('sampling_ppm_f_search_set_by_pss: try ... ... ');
             [period_ppm, f_search_set] = sampling_ppm_f_search_set_by_pss(r, td_pss);
