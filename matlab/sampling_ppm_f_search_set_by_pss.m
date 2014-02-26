@@ -10,7 +10,7 @@ len_pss = size(td_pss, 1);
 ppm = inf;
 f_set = inf;
 
-fo_search_set = -100e3 : 1e3 : 100e3; % -100kHz ~ 100 kHz with 5kHz step size
+fo_search_set = -100e3 : 5e3 : 100e3; % -100kHz ~ 100 kHz with 5kHz step size
 pss_fo_set = pss_fo_set_gen(td_pss, fo_search_set);
 
 len = length(s);
@@ -122,39 +122,85 @@ end
 ppm_store = ppm_store(1:ppm_idx);
 valid_idx = valid_idx(1:ppm_idx);
 
+extra_frequency_flag = 0;
 disp(['PPM: ' num2str(ppm_store)]);
-if (var(ppm_store) > 0.01) && (ppm_idx >= 3)
+if length(ppm_store) == 1
+    ppm = ppm_store;
+    disp(['Total ' num2str(ppm_idx) ' freq. idx for PPM: ' num2str(valid_idx)]);
+    disp(['Average PPM: ' num2str(ppm)]);
+    idx_in_fo_search_set = hit_pss_fo_set_idx(valid_idx);
+    f_set = fo_search_set(mod(idx_in_fo_search_set-1, length(fo_search_set)) + 1);
+    disp(['Period PPM ' num2str(ppm) 'PPM; f_set ' num2str(f_set./1e3) 'kHz']);
+    return;
+elseif length(ppm_store) == 2
+    ppm = mean(ppm_store);
+    disp(['Total ' num2str(ppm_idx) ' freq. idx for PPM: ' num2str(valid_idx)]);
+    disp(['Average PPM: ' num2str(ppm)]);
+    if ( abs(ppm_store(1) - ppm_store(2))/abs(ppm_store(1)) ) > (1/20)
+        idx_in_fo_search_set = hit_pss_fo_set_idx(valid_idx);
+        f_set = fo_search_set(mod(idx_in_fo_search_set-1, length(fo_search_set)) + 1);
+        disp(['Period PPM ' num2str(ppm) 'PPM; f_set ' num2str(f_set./1e3) 'kHz']);
+        return;
+    end
+elseif var(ppm_store) > 0.01
     mean_ppm = mean(ppm_store);
     tmp = abs(ppm_store - mean_ppm);
     [~, max_idx] = max(tmp);
     drop_idx = find(ppm_store==ppm_store(max_idx));
-    disp(['Drop PPM: ' num2str(ppm_store(drop_idx))]);
-    ppm_store(drop_idx) = [];
-    valid_idx(drop_idx) = [];
-    ppm_idx = ppm_idx - length(drop_idx);
+    if length(drop_idx) >= (length(ppm_store)*3/8)
+        disp('Too many PPM drops. Will not do it.');
+        extra_frequency_flag = 1;
+    else
+        disp(['Drop PPM: ' num2str(ppm_store(drop_idx))]);
+        ppm_store(drop_idx) = [];
+        valid_idx(drop_idx) = [];
+        ppm_idx = ppm_idx - length(drop_idx);
+    end
+    ppm = mean(ppm_store);
+    disp(['Total ' num2str(ppm_idx) ' freq. idx for PPM: ' num2str(valid_idx)]);
+    disp(['Average PPM: ' num2str(ppm)]);
 end
 
-ppm = mean(ppm_store);
-
-disp(['Total ' num2str(ppm_idx) ' freq. idx for PPM: ' num2str(valid_idx)]);
-disp(['Average PPM: ' num2str(ppm)]);
-
-num_f_reserve = 1;
-
-% sum_corr_val = sum(hit_corr_val(:,valid_idx),1);
 sum_corr_val = zeros(1, ppm_idx);
 for i=1:ppm_idx
     col_idx = valid_idx(i);
     sum_corr_val(i) = sum(hit_corr_val(time_location_invalid_record(:,col_idx)==0,col_idx));
 end
 
-num_reserve = min([num_f_reserve, ppm_idx]);
-[~, max_idx] = sort(sum_corr_val, 'descend');
-max_idx = max_idx(1:num_reserve);
+[~, max_idx] = max(sum_corr_val);
 disp(['Freq. idx for f_set: ' num2str(valid_idx(max_idx))]);
 
 idx_in_fo_search_set = hit_pss_fo_set_idx(valid_idx(max_idx));
 f_set = fo_search_set(mod(idx_in_fo_search_set-1, length(fo_search_set)) + 1);
+
+if extra_frequency_flag == 1
+    tmp = zeros(1, ppm_idx);
+    tmp(drop_idx) = 1;
+    reserve_idx = find(tmp==0);
+    if sum(drop_idx==max_idx)
+        extra_drop_idx = drop_idx;
+    elseif sum(reserve_idx==max_idx)
+        extra_drop_idx = reserve_idx;
+    else
+        disp('Abnormal!');
+        return;
+    end
+    valid_idx(extra_drop_idx) = [];
+    ppm_idx = ppm_idx - length(extra_drop_idx);
+    
+    sum_corr_val = zeros(1, ppm_idx);
+    for i=1:ppm_idx
+        col_idx = valid_idx(i);
+        sum_corr_val(i) = sum(hit_corr_val(time_location_invalid_record(:,col_idx)==0,col_idx));
+    end
+
+    [~, max_idx] = max(sum_corr_val);
+    disp(['Extra Freq. idx for f_set: ' num2str(valid_idx(max_idx))]);
+    
+    idx_in_fo_search_set = hit_pss_fo_set_idx(valid_idx(max_idx));
+    tmp = fo_search_set(mod(idx_in_fo_search_set-1, length(fo_search_set)) + 1);
+    f_set = [f_set tmp];
+end
 
 disp(['Period PPM ' num2str(ppm) 'PPM; f_set ' num2str(f_set./1e3) 'kHz']);
 
