@@ -14,7 +14,7 @@ fo_search_set = -100e3 : 1e3 : 100e3; % -100kHz ~ 100 kHz with 5kHz step size
 pss_fo_set = pss_fo_set_gen(td_pss, fo_search_set);
 
 len = length(s);
-th = 25; %threshold
+th = 25*265.1154; %threshold
 
 sampling_rate = 1.92e6; % LTE spec. 30.72MHz/16.
 

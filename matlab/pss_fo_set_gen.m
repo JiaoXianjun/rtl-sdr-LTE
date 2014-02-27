@@ -15,3 +15,6 @@ for i=1:num_pss
     ep = sp + num_fo - 1;
     pss_fo_set(:,sp:ep) = kron(ones(1, num_fo), pss(:,i)).*exp(1i.*2.*pi.*(1./sampling_rate).*(0:(len_pss-1)).'*fo_search_set);
 end
+
+% normalize along with column
+pss_fo_set = sqrt(len_pss).*pss_fo_set./kron( ones(len_pss,1), sqrt( sum(abs(pss_fo_set).^2,1) ) ); 

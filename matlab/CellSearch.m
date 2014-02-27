@@ -26,19 +26,19 @@ freq_set = [2604.9e6] - 1998e6;
 % set to 1 to use pre-captured file; set to 0 to use live dongle IQ samples (run "rtl_tcp -p 1234 -d 0" in shell first!)
 use_file_flag = 1; 
 % ------------------------------------------------------------------------------------
-% rtl_sdr_bin_filename = '../scan-capture/frequency-1850-1880MHz/f1860_s1.92_g0_1s_strong.bin';% hit. -41799.4828Hz; Period PPM 22.3214PPM
-% rtl_sdr_bin_filename = '../scan-capture/frequency-1850-1880MHz/f1860_s1.92_g0_1s.bin'; % 17.3611PPM; -45kHz
-% rtl_sdr_bin_filename = '../scan-capture/frequency-1880-1900MHz/f1890_s1.92_g0_1s.bin'; % hit. -41116.5265, Period PPM 20.8333PPM
-% rtl_sdr_bin_filename = '../scan-capture/frequency-2555-2575MHz/f2564.9_s1.92_g0_0.8s.bin'; % hit. 6.516kHz, Period PPM 27.7778PPM
-% rtl_sdr_bin_filename = '../scan-capture/frequency-2555-2575MHz/f2565_s1.92_g0_1s.bin'; % -35kHz, 116.4426PPM
-% rtl_sdr_bin_filename = '../scan-capture/frequency-2555-2575MHz/f2564.9_s1.92_g0_1s.bin'; % hit. -36.1386kHz, Period PPM 111.1111PPM
-% rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz-know-PPM/f2645_s1.92_g0_SamplingPPM26.2_1s.bin'; % hit -90568.0993Hz, Period PPM 27.7778PPM
-% rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz-know-PPM/f2645_s1.92_g20_SamplingPPM26.2_1s.bin'; % -89531.0772Hz, 26.2009PPM
-rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz/f2645_s1.92_g0_1s.bin'; % hit. -89529.2574Hz, Period PPM 27.7778PPM
-% rtl_sdr_bin_filename = '../scan-capture/frequency-2575-2595MHz/f2585_s1.92_g0_0.8s.bin'; % hit. -94.266kHz, Period PPM 7.4405PPM
-% rtl_sdr_bin_filename = '../scan-capture/frequency-2575-2595MHz/f2585_s1.92_g0_1s.bin'; % -87975.8941Hz, 26.2009PPM
-% rtl_sdr_bin_filename = '../scan-capture/frequency-2595-2615MHz/f2604.9_s1.92_g0_0.8s.bin'; % hit. 4.9052kHz, Period PPM 25.0496PP
-% rtl_sdr_bin_filename = '../scan-capture/frequency-2595-2615MHz/f2605_s1.92_g0_1s.bin'; % -65kHz, 116.4426PPM
+% rtl_sdr_bin_filename = '../scan-capture/frequency-1850-1880MHz/f1860_s1.92_g0_1s_strong.bin';% hit. -41.799kHz; Period PPM 22.3214PPM
+% rtl_sdr_bin_filename = '../scan-capture/frequency-1850-1880MHz/f1860_s1.92_g0_1s.bin';       %      -45kHz 17.3611PPM;
+% rtl_sdr_bin_filename = '../scan-capture/frequency-1880-1900MHz/f1890_s1.92_g0_1s.bin';       % hit. -41.117kHz, Period PPM 20.8333PPM
+% rtl_sdr_bin_filename = '../scan-capture/frequency-2555-2575MHz/f2564.9_s1.92_g0_0.8s.bin';   % hit. 6.516kHz, Period PPM 27.7778PPM
+% rtl_sdr_bin_filename = '../scan-capture/frequency-2555-2575MHz/f2565_s1.92_g0_1s.bin';       %      -35kHz, 116.4426PPM
+% rtl_sdr_bin_filename = '../scan-capture/frequency-2555-2575MHz/f2564.9_s1.92_g0_1s.bin';     % hit. -36.1386kHz, Period PPM 111.1111PPM
+% rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz-know-PPM/f2645_s1.92_g0_SamplingPPM26.2_1s.bin';  % hit. -90.568kHz, Period PPM 27.7778PPM
+% rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz-know-PPM/f2645_s1.92_g20_SamplingPPM26.2_1s.bin'; %      -89.531kHz, 26.2009PPM
+rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz/f2645_s1.92_g0_1s.bin';       % hit. -89.529kHz, Period PPM 27.7778PPM
+% rtl_sdr_bin_filename = '../scan-capture/frequency-2575-2595MHz/f2585_s1.92_g0_0.8s.bin';     % hit. -94.266kHz, Period PPM 7.4405PPM
+% rtl_sdr_bin_filename = '../scan-capture/frequency-2575-2595MHz/f2585_s1.92_g0_1s.bin';       %      -87.976kHz, 26.2009PPM
+% rtl_sdr_bin_filename = '../scan-capture/frequency-2595-2615MHz/f2604.9_s1.92_g0_0.8s.bin';     % hit. 4.9052kHz, Period PPM 25.0496PP
+% rtl_sdr_bin_filename = '../scan-capture/frequency-2595-2615MHz/f2605_s1.92_g0_1s.bin';       %      -65kHz, 116.4426PPM
 
 % % !!! Actually each time run with rtl-sdr dongle, this script saves a bin
 % % file automatically!!!
