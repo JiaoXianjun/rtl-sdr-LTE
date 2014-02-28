@@ -202,7 +202,8 @@ for freq_idx = 1 : loop_size
 
         disp(['Input averaged abs: ' num2str( mean(abs([real(r); imag(r)])) )]);
 
-        r = filter(coef, 1, r);
+        r = filter(coef, 1, [r; zeros(length(coef)-1,1)]);
+        r = r( (((length(coef)-1)/2)+1) : (end-((length(coef)-1)/2)) );
 
         if use_file_flag == 1
             if sampling_carrier_twist==0
