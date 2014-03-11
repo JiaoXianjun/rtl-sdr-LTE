@@ -122,11 +122,17 @@ end
 ppm_store = ppm_store(1:ppm_idx);
 valid_idx = valid_idx(1:ppm_idx);
 
+valid_idx_backup = valid_idx;
+
 extra_frequency_flag = 0;
 disp(['PPM: ' num2str(ppm_store)]);
+pss_idx = floor( (hit_pss_fo_set_idx(valid_idx)-1)./length(fo_search_set) ) + 1;
+disp(['PSS: ' num2str(pss_idx)]);
 if length(ppm_store) == 1
     ppm = ppm_store;
     disp(['Total ' num2str(ppm_idx) ' freq. idx for PPM: ' num2str(valid_idx)]);
+    pss_idx = floor( (hit_pss_fo_set_idx(valid_idx)-1)./length(fo_search_set) ) + 1;
+    disp(['Total ' num2str(ppm_idx) '  pss. idx for PPM: ' num2str(pss_idx)]);
     disp(['Average PPM: ' num2str(ppm)]);
     idx_in_fo_search_set = hit_pss_fo_set_idx(valid_idx);
     f_set = fo_search_set(mod(idx_in_fo_search_set-1, length(fo_search_set)) + 1);
@@ -135,9 +141,18 @@ if length(ppm_store) == 1
 elseif length(ppm_store) == 2
     ppm = mean(ppm_store);
     disp(['Total ' num2str(ppm_idx) ' freq. idx for PPM: ' num2str(valid_idx)]);
+    pss_idx = floor( (hit_pss_fo_set_idx(valid_idx)-1)./length(fo_search_set) ) + 1;
+    disp(['Total ' num2str(ppm_idx) '  pss. idx for PPM: ' num2str(pss_idx)]);
     disp(['Average PPM: ' num2str(ppm)]);
     if ( abs(ppm_store(1) - ppm_store(2))/abs(ppm_store(1)) ) > (1/20)
         idx_in_fo_search_set = hit_pss_fo_set_idx(valid_idx);
+        
+        fo_idx = idx_in_fo_search_set - (pss_idx-1).*length(fo_search_set); % remove duplicated fo
+        if fo_idx(1) == fo_idx(2)
+            disp(['Discard duplicated frequency idx ' num2str(idx_in_fo_search_set)]);
+            idx_in_fo_search_set = idx_in_fo_search_set(1);
+        end
+        
         f_set = fo_search_set(mod(idx_in_fo_search_set-1, length(fo_search_set)) + 1);
         disp(['Period PPM ' num2str(ppm) 'PPM; f_set ' num2str(f_set./1e3) 'kHz']);
         return;
@@ -158,6 +173,8 @@ elseif var(ppm_store) > 0.01
     end
     ppm = mean(ppm_store);
     disp(['Total ' num2str(ppm_idx) ' freq. idx for PPM: ' num2str(valid_idx)]);
+    pss_idx = floor( (hit_pss_fo_set_idx(valid_idx)-1)./length(fo_search_set) ) + 1;
+    disp(['Total ' num2str(ppm_idx) '  pss. idx for PPM: ' num2str(pss_idx)]);
     disp(['Average PPM: ' num2str(ppm)]);
 end
 
@@ -171,9 +188,9 @@ end
 disp(['Freq. idx for f_set: ' num2str(valid_idx(max_idx))]);
 
 idx_in_fo_search_set = hit_pss_fo_set_idx(valid_idx(max_idx));
-f_set = fo_search_set(mod(idx_in_fo_search_set-1, length(fo_search_set)) + 1);
 
 if extra_frequency_flag == 1
+    extra_valid_idx = valid_idx;
     tmp = zeros(1, ppm_idx);
     tmp(drop_idx) = 1;
     reserve_idx = find(tmp==0);
@@ -185,22 +202,72 @@ if extra_frequency_flag == 1
         disp('Abnormal!');
         return;
     end
-    valid_idx(extra_drop_idx) = [];
-    ppm_idx = ppm_idx - length(extra_drop_idx);
+    extra_valid_idx(extra_drop_idx) = [];
+    extra_ppm_idx = ppm_idx - length(extra_drop_idx);
     
-    sum_corr_val = zeros(1, ppm_idx);
-    for i=1:ppm_idx
-        col_idx = valid_idx(i);
+    sum_corr_val = zeros(1, extra_ppm_idx);
+    for i=1:extra_ppm_idx
+        col_idx = extra_valid_idx(i);
         sum_corr_val(i) = sum(hit_corr_val(time_location_invalid_record(:,col_idx)==0,col_idx));
     end
 
     [~, max_idx] = max(sum_corr_val);
-    disp(['Extra Freq. idx for f_set: ' num2str(valid_idx(max_idx))]);
+    disp(['Extra Freq. idx for f_set: ' num2str(extra_valid_idx(max_idx))]);
+    pss_idx = floor( (hit_pss_fo_set_idx(extra_valid_idx(max_idx))-1)./length(fo_search_set) ) + 1;
+    disp(['Extra  Pss. idx for f_set: ' num2str(pss_idx)]);
     
-    idx_in_fo_search_set = hit_pss_fo_set_idx(valid_idx(max_idx));
-    tmp = fo_search_set(mod(idx_in_fo_search_set-1, length(fo_search_set)) + 1);
-    f_set = [f_set tmp];
+    idx_in_fo_search_set = [idx_in_fo_search_set hit_pss_fo_set_idx(extra_valid_idx(max_idx))];
 end
+
+% add fo from other PSSs if there are
+pss_idx = floor( (idx_in_fo_search_set-1)./length(fo_search_set) ) + 1;
+
+num_pss = 3;
+extra_pss_set = zeros(1, num_pss);
+for idx=1:num_pss
+    if ~isempty(find(pss_idx==idx, 1))
+        extra_pss_set(idx) = 1;
+    end
+end
+if sum(extra_pss_set)<3
+    extra_pss_set = find(extra_pss_set==0);
+    tmp_hit_pss_fo_set_idx = hit_pss_fo_set_idx(valid_idx_backup);
+    exist_pss_idx = floor( (tmp_hit_pss_fo_set_idx-1)./length(fo_search_set) ) + 1;
+    for idx=1:length(extra_pss_set)
+        extra_pss_idx = extra_pss_set(idx);
+        col_set = find(exist_pss_idx==extra_pss_idx);
+        
+        if ~isempty(col_set)
+            sum_corr_val = zeros(1, length(col_set));
+            for i=1:length(col_set)
+                col_idx = valid_idx_backup( col_set(i) );
+                sum_corr_val(i) = sum(hit_corr_val(time_location_invalid_record(:,col_idx)==0,col_idx));
+            end
+
+            [~, max_idx] = max(sum_corr_val);
+            disp(['Extra Freq. idx for f_set (multi-PSS): ' num2str(valid_idx_backup( col_set(max_idx) ))]);
+            pss_idx = floor( (hit_pss_fo_set_idx(valid_idx_backup( col_set(max_idx) ))-1)./length(fo_search_set) ) + 1;
+            disp(['Extra  Pss. idx for f_set (multi-PSS): ' num2str(pss_idx)]);
+
+            idx_in_fo_search_set = [idx_in_fo_search_set hit_pss_fo_set_idx(valid_idx_backup( col_set(max_idx) ))];
+        end
+    end
+end
+
+pss_idx = floor( (idx_in_fo_search_set-1)./length(fo_search_set) ) + 1;
+fo_idx = idx_in_fo_search_set - (pss_idx-1).*length(fo_search_set); % remove duplicated fo
+[fo_idx, sort_idx] = sort(fo_idx);
+idx_in_fo_search_set = idx_in_fo_search_set(sort_idx);
+drop_idx = find(diff(fo_idx)==0) + 1;
+if ~isempty(drop_idx)
+    tmp_idx = zeros(1, 2*length(drop_idx));
+    tmp_idx(2:2:end) = drop_idx;
+    tmp_idx(1:2:end) = drop_idx-1;
+    disp(['Discard duplicated frequency idx (multi-PSS) ' num2str( idx_in_fo_search_set(tmp_idx) )]);
+    idx_in_fo_search_set(drop_idx) = [];
+end
+
+f_set = fo_search_set(mod(idx_in_fo_search_set-1, length(fo_search_set)) + 1);
 
 disp(['Period PPM ' num2str(ppm) 'PPM; f_set ' num2str(f_set./1e3) 'kHz']);
 
