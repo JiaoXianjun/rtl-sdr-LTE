@@ -6,6 +6,7 @@ function [ppm, f_set] = sampling_ppm_f_search_set_by_pss(s, td_pss)
 % sampling period PPM! not sampling frequency PPM!
 
 len_pss = size(td_pss, 1);
+num_pss = 3;
 
 ppm = inf;
 f_set = inf;
@@ -32,9 +33,38 @@ if ~sum(hit_pss_fo_set_idx)
     return;
 end
 
-pss_period = num_sample_per_radioframe/2;
+num_fo = length(hit_pss_fo_set_idx);
+max_reserve_per_pss = 8;
+pss_idx = floor( (hit_pss_fo_set_idx-1)./length(fo_search_set) ) + 1;
+
+% method for C
+pss_reserve_idx_bin = zeros(num_pss,num_fo);
+for i=1:num_pss
+    pss_reserve_idx_bin(i,:) = (pss_idx==i);
+    tmp_num = sum(pss_reserve_idx_bin(i,:));
+    if tmp_num>max_reserve_per_pss
+        num_discard = tmp_num - max_reserve_per_pss;
+        for j=num_fo:-1:1
+            if pss_reserve_idx_bin(i,j)==1
+                pss_reserve_idx_bin(i,j) = 0;
+                num_discard = num_discard - 1;
+                if num_discard == 0
+                    break;
+                end
+            end
+        end
+    end
+end
+reserve_idx = find(sum(pss_reserve_idx_bin, 1));
+
+hit_pss_fo_set_idx = hit_pss_fo_set_idx(reserve_idx);
+hit_time_idx = hit_time_idx(reserve_idx);
+corr_val = corr_val(reserve_idx);
 
 num_fo = length(hit_pss_fo_set_idx);
+
+pss_period = num_sample_per_radioframe/2;
+
 max_num_hit = ceil(len/pss_period);
 time_location = zeros(max_num_hit, num_fo);
 time_location(1,:) = hit_time_idx;
@@ -137,6 +167,7 @@ if length(ppm_store) == 1
     idx_in_fo_search_set = hit_pss_fo_set_idx(valid_idx);
     f_set = fo_search_set(mod(idx_in_fo_search_set-1, length(fo_search_set)) + 1);
     disp(['Period PPM ' num2str(ppm) 'PPM; f_set ' num2str(f_set./1e3) 'kHz']);
+    disp(['Final PSS idx ' num2str(pss_idx)]);
     return;
 elseif length(ppm_store) == 2
     ppm = mean(ppm_store);
@@ -155,6 +186,7 @@ elseif length(ppm_store) == 2
         
         f_set = fo_search_set(mod(idx_in_fo_search_set-1, length(fo_search_set)) + 1);
         disp(['Period PPM ' num2str(ppm) 'PPM; f_set ' num2str(f_set./1e3) 'kHz']);
+        disp(['Final PSS idx ' num2str(pss_idx)]);
         return;
     end
 elseif var(ppm_store) > 0.01
@@ -222,7 +254,6 @@ end
 % add fo from other PSSs if there are
 pss_idx = floor( (idx_in_fo_search_set-1)./length(fo_search_set) ) + 1;
 
-num_pss = 3;
 extra_pss_set = zeros(1, num_pss);
 for idx=1:num_pss
     if ~isempty(find(pss_idx==idx, 1))
@@ -270,6 +301,7 @@ end
 f_set = fo_search_set(mod(idx_in_fo_search_set-1, length(fo_search_set)) + 1);
 
 disp(['Period PPM ' num2str(ppm) 'PPM; f_set ' num2str(f_set./1e3) 'kHz']);
+disp(['Final PSS idx ' num2str(pss_idx)]);
 
 % % ----------------------------------------------------------------------
 

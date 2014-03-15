@@ -6,10 +6,9 @@ function [hit_pss_fo_set_idx, hit_time_idx, hit_corr_val] = pss_moving_corr(s, p
 
 len_pss = size(pss_fo_set, 1);
 num_fo_pss = size(pss_fo_set, 2);
-max_reserve = 8;
-hit_pss_fo_set_idx = zeros(1, max_reserve);
-hit_time_idx = zeros(1, max_reserve);
-hit_corr_val = zeros(1, max_reserve);
+hit_pss_fo_set_idx = 0;
+hit_time_idx = 0;
+hit_corr_val = 0;
 
 len = length(s);
 % metric_record = zeros(len - (len_pss-1), num_fo_pss);
@@ -90,8 +89,6 @@ if end_idx ~= inf
     else
         num_valid = idx-1;
     end
-    num_valid = min(num_valid, max_reserve);
-    
     hit_pss_fo_set_idx = sort_idx(1:num_valid);
     hit_corr_val = max_val(1:num_valid);
     hit_time_idx = last_idx - max_idx(hit_pss_fo_set_idx) + 1;
