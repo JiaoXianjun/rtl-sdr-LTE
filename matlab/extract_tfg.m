@@ -1,4 +1,4 @@
-function [tfg tfg_timestamp]=extract_tfg(peak,capbuf,fc,sampling_carrier_twist,k_factor)
+function [tfg tfg_timestamp]=extract_tfg(peak,capbuf,fc,sampling_carrier_twist)
 
 % Convert from time domain to frequency domain and create the time/frequency
 % grid.
@@ -29,6 +29,8 @@ if sampling_carrier_twist==1
     k_factor=(fc-peak.freq_fine)/fc;
 % else
 %     k_factor=1;
+else
+    k_factor = peak.k_factor;
 end
 
 if (strcmpi(cp_type,'normal'))

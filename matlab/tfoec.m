@@ -1,4 +1,4 @@
-function [tfg_comp tfg_comp_timestamp peak_out]=tfoec(peak,tfg,tfg_timestamp,fc,sampling_carrier_twist,k_factor)
+function [tfg_comp tfg_comp_timestamp peak_out]=tfoec(peak,tfg,tfg_timestamp,fc,sampling_carrier_twist)
 
 % Compensates for frequency offset, time offset, and also rotates the
 % RS so that they properly reflect the channel response.
@@ -30,6 +30,8 @@ if sampling_carrier_twist==1
     k_factor=(fc-peak.freq_fine)/fc;
 % else
 %     k_factor=1;
+else
+    k_factor = peak.k_factor;
 end
 
 % Second order derivations
@@ -119,7 +121,7 @@ peak_out.freq_superfine=peak_out.freq_fine+residual_f;
 if sampling_carrier_twist==1
     k_factor_residual=(fc-residual_f)/fc;
 else
-    k_factor_residual=k_factor;
+    k_factor_residual=peak.k_factor;
 end
 
 tfg_comp=NaN(size(tfg));

@@ -1,4 +1,4 @@
-function peaks=peak_search(xc_incoherent_collapsed_pow,xc_incoherent_collapsed_frq,Z_th1,f_search_set);
+function peaks=peak_search(xc_incoherent_collapsed_pow,xc_incoherent_collapsed_frq,Z_th1,f_search_set,sampling_carrier_twist,k_factor)
 
 % Copyright 2012 Evrytania LLC (http://www.evrytania.com)
 %
@@ -56,6 +56,12 @@ while (1)
   rec.n_id_cell=NaN;
   rec.n_ports=NaN;
   rec.duplex_mode=NaN;
+  
+  if sampling_carrier_twist==1
+      rec.k_factor = 1;
+  else
+      rec.k_factor = k_factor;
+  end
   peaks=[peaks rec];
   % Cancel out certain peaks around this one.
   % It's assumed that if there is a peak for PSS N at offset I, there cannot

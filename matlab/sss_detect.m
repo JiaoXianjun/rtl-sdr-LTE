@@ -1,4 +1,4 @@
-function peak_out = sss_detect(peak,capbuf,thresh2_n_sigma,fc,sampling_carrier_twist,k_factor,tdd_flag)
+function peak_out = sss_detect(peak,capbuf,thresh2_n_sigma,fc,sampling_carrier_twist,tdd_flag)
 
 % Perform maximum likelihood estimation of the SSS.
 
@@ -28,6 +28,8 @@ if sampling_carrier_twist==1
     k_factor=(fc-peak.freq)/fc;
 % else
 %     k_factor=1;
+else
+    k_factor = peak.k_factor;
 end
 
 if tdd_flag == 1
