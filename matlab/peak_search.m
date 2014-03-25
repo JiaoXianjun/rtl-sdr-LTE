@@ -57,11 +57,7 @@ while (1)
   rec.n_ports=NaN;
   rec.duplex_mode=NaN;
   
-  if sampling_carrier_twist==1
-      rec.k_factor = 1;
-  else
-      rec.k_factor = k_factor;
-  end
+  rec.k_factor = k_factor;
   peaks=[peaks rec];
   % Cancel out certain peaks around this one.
   % It's assumed that if there is a peak for PSS N at offset I, there cannot
