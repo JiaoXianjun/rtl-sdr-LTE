@@ -185,7 +185,7 @@ for i=1:length(sort_idx)
     
     exist_flag = false;
     for j=1:real_count
-        if f_tmp == f_set(j) && ppm_tmp == ppm(j)
+        if f_tmp == f_set(j) && abs(ppm_tmp - ppm(j))<4
             exist_flag = true;
             disp(['duplicated fo and ppm ' num2str(f_tmp/1e3) 'kHz ' num2str(ppm_tmp) 'PPM at i=' num2str(i) ' j=' num2str(j)]);
             break;
