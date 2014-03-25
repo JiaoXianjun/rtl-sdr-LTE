@@ -1,5 +1,5 @@
 function [xc_incoherent_collapsed_pow xc_incoherent_collapsed_frq n_comb_xc n_comb_sp xc_incoherent_single xc_incoherent sp_incoherent xc sp] = ...
-    xcorr_pss(capbuf,f_search_set,ds_comb_arm,fc,sampling_carrier_twist,k_factor,corr_store)
+    xcorr_pss(capbuf,f_search_set,ds_comb_arm,fc,sampling_carrier_twist,k_factor,xc)
 
 % Copyright 2012 Evrytania LLC (http://www.evrytania.com)
 %
@@ -44,19 +44,19 @@ error(chk_param(fc,'fc','scalar','real','>',0));
 n_cap=length(capbuf);
 n_f=length(f_search_set);
 
-% Correlate against the PSS
-xc=NaN(3,n_cap-136,n_f);
-for foi=1:n_f
-%   f_off=f_search_set(foi);
-  for t=1:3
-%     temp=conj(fshift(pss_td(t,:),f_off,fs_lte/16)/137);
-%     for k=1:n_cap-136
-%       xc(t,k,foi)=sum(temp.*capbuf(k:k+136));
-%     end
-    col_idx = (t-1)*n_f + foi;
-    xc(t,:,foi)=corr_store(1:(n_cap-136),col_idx);
-  end
-end
+% % Correlate against the PSS
+% xc=NaN(3,n_cap-136,n_f);
+% for foi=1:n_f
+% %   f_off=f_search_set(foi);
+%   for t=1:3
+% %     temp=conj(fshift(pss_td(t,:),f_off,fs_lte/16)/137);
+% %     for k=1:n_cap-136
+% %       xc(t,k,foi)=sum(temp.*capbuf(k:k+136));
+% %     end
+%     col_idx = (t-1)*n_f + foi;
+%     xc(t,:,foi)=corr_store(1:(n_cap-136),col_idx);
+%   end
+% end
 
 % Calculate the received power in the vicinity of the possible PSS
 sp=NaN(1,n_cap-136-137);

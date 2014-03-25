@@ -223,7 +223,7 @@ for freq_idx = 1 : loop_size
         capbuf = r.';
 
         disp('sampling_ppm_f_search_set_by_pss: try ... ... ');
-        [period_ppm, dynamic_f_search_set, corr_store, pss_idx_set, fo_pss_idx_set, fo_with_all_pss_idx] = sampling_ppm_f_search_set_by_pss(r, f_search_set, pss_fo_set, sampling_carrier_twist);
+        [period_ppm, dynamic_f_search_set, xc] = sampling_ppm_f_search_set_by_pss(r, f_search_set, pss_fo_set, sampling_carrier_twist);
         if sampling_carrier_twist==0
             if period_ppm == inf
                 disp('No valid PSS is found at pre-proc phase! Please try again.');
@@ -240,7 +240,7 @@ for freq_idx = 1 : loop_size
                 col_idx = i:length(k_factor_set):3*length(k_factor_set);
                 
                 [xc_incoherent_collapsed_pow, xc_incoherent_collapsed_frq, n_comb_xc, n_comb_sp, xc_incoherent_single, xc_incoherent, sp_incoherent, xc, sp]= ...
-                xcorr_pss(capbuf,dynamic_f_search_set(i),DS_COMB_ARM,fc,sampling_carrier_twist,k_factor_set(i), corr_store(:,col_idx));
+                xcorr_pss(capbuf,dynamic_f_search_set(i),DS_COMB_ARM,fc,sampling_carrier_twist,k_factor_set(i), xc(:,:,i));
 
                 R_th1=chi2inv(1-(10.0^(-thresh1_n_nines)), 2*n_comb_xc*(2*DS_COMB_ARM+1));
                 Z_th1=R_th1*sp_incoherent/rx_cutoff/137/2/n_comb_xc/(2*DS_COMB_ARM+1);
@@ -250,7 +250,7 @@ for freq_idx = 1 : loop_size
             end
         else
             [xc_incoherent_collapsed_pow, xc_incoherent_collapsed_frq, n_comb_xc, n_comb_sp, xc_incoherent_single, xc_incoherent, sp_incoherent, xc, sp]= ...
-            xcorr_pss(capbuf,dynamic_f_search_set,DS_COMB_ARM,fc,sampling_carrier_twist,1, corr_store);
+            xcorr_pss(capbuf,dynamic_f_search_set,DS_COMB_ARM,fc,sampling_carrier_twist,1, xc);
 
             R_th1=chi2inv(1-(10.0^(-thresh1_n_nines)), 2*n_comb_xc*(2*DS_COMB_ARM+1));
             Z_th1=R_th1*sp_incoherent/rx_cutoff/137/2/n_comb_xc/(2*DS_COMB_ARM+1);

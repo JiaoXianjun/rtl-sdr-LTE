@@ -2,7 +2,7 @@
 % Find out LTE PSS in the signal stream and correct sampling&carrier error.
 % A script of project: https://github.com/JiaoXianjun/rtl-sdr-LTE
 
-function [ppm, f_set, corr_store, pss_idx_set, fo_pss_idx_set, fo_with_all_pss_idx] = sampling_ppm_f_search_set_by_pss(s, fo_search_set, pss_fo_set, sampling_carrier_twist)
+function [ppm, f_set, xc, fo_idx_set, pss_idx_set, fo_pss_idx_set, fo_with_all_pss_idx] = sampling_ppm_f_search_set_by_pss(s, fo_search_set, pss_fo_set, sampling_carrier_twist)
 % sampling period PPM! not sampling frequency PPM!
 
 % fo_search_set = -100e3 : 5e3 : 100e3; % -100kHz ~ 100 kHz with 5kHz step size
@@ -24,6 +24,17 @@ end
 if sampling_carrier_twist==1
     ppm = inf;
     f_set = fo_search_set;
+    
+    fo_idx_set = 1:length(f_set);
+    n_f = length(f_set);
+    xc=zeros(3,len-(len_pss-1),n_f);
+    for foi=1:n_f
+      for t=1:3
+        col_idx = (t-1)*length(fo_search_set) + fo_idx_set(foi);
+        xc(t,:,foi)=corr_store(1:len-(len_pss-1),col_idx);
+      end
+    end
+
     pss_idx_set = inf;
     fo_pss_idx_set = inf;
     fo_with_all_pss_idx = inf;
@@ -66,8 +77,10 @@ above_par_idx = (peak_to_avg(sort_idx(1:max_reserve)) > 8.5);
 disp(['Hit        PAR ' num2str(peak_to_avg(sort_idx(1:max_reserve))) 'dB']);
 
 if sum(above_par_idx)==0
+    xc = 0;
     ppm = inf;
     f_set = inf;
+    fo_idx_set = inf;
     pss_idx_set = inf;
     fo_pss_idx_set = inf;
     fo_with_all_pss_idx = inf;
@@ -190,8 +203,10 @@ for i=1:length(sort_idx)
 end
 
 if real_count==0
+    xc = 0;
     ppm = inf;
     f_set = inf;
+    fo_idx_set = inf;
     pss_idx_set = inf;
     fo_pss_idx_set = inf;
     fo_with_all_pss_idx = inf;
@@ -207,7 +222,14 @@ fo_idx_set = fo_idx_set(1:real_count);
 
 fo_with_all_pss_idx = [fo_idx_set, length(fo_search_set) + fo_idx_set, length(fo_search_set)*2 + fo_idx_set];
 
-corr_store = corr_store(:, fo_with_all_pss_idx);
+n_f = length(f_set);
+xc=zeros(3,len-(len_pss-1),n_f);
+for foi=1:n_f
+  for t=1:3
+    col_idx = (t-1)*length(fo_search_set) + fo_idx_set(foi);
+    xc(t,:,foi)=corr_store(1:len-(len_pss-1),col_idx);
+  end
+end
 
 disp(['Hit         FO ' num2str(f_set./1e3) 'kHz']);
 disp(['Hit        PPM ' num2str(ppm)]);
