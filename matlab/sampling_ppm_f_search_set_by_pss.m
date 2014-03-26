@@ -73,7 +73,7 @@ end
 
 [~, sort_idx] = sort(max_peak_all, 'descend');
 
-max_reserve = 1;
+max_reserve = 4;
 above_par_idx = (peak_to_avg(sort_idx(1:max_reserve)) > 8.5);
 disp(['Hit        PAR ' num2str(peak_to_avg(sort_idx(1:max_reserve))) 'dB']);
 
@@ -186,7 +186,7 @@ for i=1:length(sort_idx)
     
     exist_flag = false;
     for j=1:real_count
-        if f_tmp == f_set(j) && abs(ppm_tmp - ppm(j))<4
+        if abs(f_tmp - f_set(j))<7500 && abs(ppm_tmp - ppm(j))<6
             exist_flag = true;
             disp(['duplicated fo and ppm ' num2str(f_tmp/1e3) 'kHz ' num2str(ppm_tmp) 'PPM at i=' num2str(i) ' j=' num2str(j)]);
             break;
