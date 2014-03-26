@@ -27,14 +27,14 @@ freq_set = 1860e6;
 use_file_flag = 1; 
 % ------------------------------------------------------------------------------------
 % rtl_sdr_bin_filename = '../scan-capture/frequency-1850-1880MHz/f1860_s1.92_g0_1s_strong.bin';% hit. -41.799kHz; Period PPM 22.3214PPM (hit at Try idx 1, pre-search pss 2, MIB pss 2 3)
-% rtl_sdr_bin_filename = '../scan-capture/frequency-1850-1880MHz/f1860_s1.92_g0_1s.bin';       %      -45kHz 17.3611PPM;
+rtl_sdr_bin_filename = '../scan-capture/frequency-1850-1880MHz/f1860_s1.92_g0_1s.bin';       %      -45kHz 17.3611PPM;
 % rtl_sdr_bin_filename = '../scan-capture/frequency-1880-1900MHz/f1890_s1.92_g0_1s.bin';       % hit. -41.117kHz, Period PPM 20.8333PPM (hit at Try idx 1)
 % rtl_sdr_bin_filename = '../scan-capture/frequency-2555-2575MHz/f2564.9_s1.92_g0_0.8s.bin';   % hit. 6.516kHz, Period PPM 27.7778PPM (hit at Try idx 3,0, but try 4 in C code, pre-search pss 2, MIB pss 1)
 % rtl_sdr_bin_filename = '../scan-capture/frequency-2555-2575MHz/f2565_s1.92_g0_1s.bin';       %      -35kHz (new alg -- 60kHz), 116.4426PPM
 % rtl_sdr_bin_filename = '../scan-capture/frequency-2555-2575MHz/f2564.9_s1.92_g0_1s.bin';     % hit. -36.1386kHz, Period PPM 111.1111PPM (hit at Try idx 8, but not hit in C code)
 % rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz-know-PPM/f2645_s1.92_g0_SamplingPPM26.2_1s.bin';  % hit. -90.568kHz, Period PPM 27.7778PPM (hit at Try idx 1)
 % rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz-know-PPM/f2645_s1.92_g20_SamplingPPM26.2_1s.bin'; %      -89.531kHz, 26.2009PPM
-rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz/f2645_s1.92_g0_1s.bin';       % hit. -89.529kHz, Period PPM 27.7778PPM (hit at Try idx 1, but try 3 in C code)
+% rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz/f2645_s1.92_g0_1s.bin';       % hit. -89.529kHz, Period PPM 27.7778PPM (hit at Try idx 1, but try 3 in C code)
 % rtl_sdr_bin_filename = '../scan-capture/frequency-2575-2595MHz/f2585_s1.92_g0_0.8s.bin';     % hit. -94.266kHz (new alg: 26PPM, hit idx 6), Period PPM 7.4405PPM (hit at Try idx 3, pre-search pss 3, MIB pss 2)
 % rtl_sdr_bin_filename = '../scan-capture/frequency-2575-2595MHz/f2585_s1.92_g0_1s.bin';       % hit. -87.9667kHz, 25.1705PPM, (hit at Try idx 2, pre-search pss 3 1, MIB pss 3, but not hit in C code)
 % rtl_sdr_bin_filename = '../scan-capture/frequency-2595-2615MHz/f2604.9_s1.92_g0_0.8s.bin';     % hit. 4.9052kHz, Period PPM 25.0496PP (hit at Try idx 4)
@@ -245,17 +245,17 @@ for freq_idx = 1 : loop_size
                 R_th1=chi2inv(1-(10.0^(-thresh1_n_nines)), 2*n_comb_xc*(2*DS_COMB_ARM+1));
                 Z_th1=R_th1*sp_incoherent/rx_cutoff/137/2/n_comb_xc/(2*DS_COMB_ARM+1);
 
-                tmp_peak=peak_search(xc_incoherent_collapsed_pow,xc_incoherent_collapsed_frq,Z_th1,dynamic_f_search_set(i),sampling_carrier_twist,k_factor_set(i));
+                tmp_peak=peak_search(xc_incoherent_collapsed_pow,xc_incoherent_collapsed_frq,Z_th1,dynamic_f_search_set(i),fc,sampling_carrier_twist,k_factor_set(i));
                 peaks = [peaks tmp_peak];
             end
         else
             [xc_incoherent_collapsed_pow, xc_incoherent_collapsed_frq, n_comb_xc, n_comb_sp, xc_incoherent_single, xc_incoherent, sp_incoherent, xc, sp]= ...
-            xcorr_pss(capbuf,dynamic_f_search_set,DS_COMB_ARM,fc,sampling_carrier_twist,1, xc);
+            xcorr_pss(capbuf,dynamic_f_search_set,DS_COMB_ARM,fc,sampling_carrier_twist,NaN, xc);
 
             R_th1=chi2inv(1-(10.0^(-thresh1_n_nines)), 2*n_comb_xc*(2*DS_COMB_ARM+1));
             Z_th1=R_th1*sp_incoherent/rx_cutoff/137/2/n_comb_xc/(2*DS_COMB_ARM+1);
 
-            peaks=peak_search(xc_incoherent_collapsed_pow,xc_incoherent_collapsed_frq,Z_th1,dynamic_f_search_set,sampling_carrier_twist,1);
+            peaks=peak_search(xc_incoherent_collapsed_pow,xc_incoherent_collapsed_frq,Z_th1,dynamic_f_search_set,fc, sampling_carrier_twist,NaN);
         end
 
         detect_flag = zeros(1, length(peaks));

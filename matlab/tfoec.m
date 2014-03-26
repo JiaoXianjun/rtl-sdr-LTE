@@ -115,13 +115,16 @@ end
 
 residual_f=angle(foe)/(2*pi)/(k_factor*.0005);
 peak_out.freq_superfine=peak_out.freq_fine+residual_f;
+if sampling_carrier_twist
+    peak_out.k_factor=(fc-peak_out.freq_superfine)/fc;
+end
 
 % Perform FOC. This does not compensate for the ICI, only the bulk
 % frequency offset and time shift between OFDM symbols.
 if sampling_carrier_twist==1
     k_factor_residual=(fc-residual_f)/fc;
 else
-    k_factor_residual=peak.k_factor;
+    k_factor_residual=1;
 end
 
 tfg_comp=NaN(size(tfg));
