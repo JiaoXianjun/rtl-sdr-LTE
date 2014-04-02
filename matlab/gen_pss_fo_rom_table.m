@@ -3,6 +3,30 @@ close all;
 clear all;
 f_search_set = -60e3:5e3:55e3;
 [~, td_pss] = pss_gen;
+
+tmp_td_pss = td_pss./137;
+fid = fopen('pss_rom_table.txt', 'w');
+fprintf(fid, '__constant float2 td_pss[3][137] = { \\ \n');
+
+for i=1:2
+    fprintf(fid, '{');
+    for j=1:136
+        fprintf(fid, '(float2)(%e,%e), ', real(tmp_td_pss(j,i)), imag(tmp_td_pss(j,i)));
+    end
+    j = j + 1;
+    fprintf(fid, '(float2)(%e,%e)},\\ \n ', real(tmp_td_pss(j,i)), imag(tmp_td_pss(j,i)));
+end
+i = 3;
+fprintf(fid, '{');
+for j=1:136
+    fprintf(fid, '(float2)(%e,%e), ', real(tmp_td_pss(j,i)), imag(tmp_td_pss(j,i)));
+end
+j = j + 1;
+fprintf(fid, '(float2)(%e,%e)}};\n ', real(tmp_td_pss(j,i)), imag(tmp_td_pss(j,i)));
+
+fclose(fid);
+
+
 pss_fo_set = pss_fo_set_gen(td_pss, f_search_set);
 pss_fo_set = pss_fo_set.';
 
@@ -43,7 +67,7 @@ fid = fopen('pss_fo_rom_table.txt', 'w');
 
 fprintf(fid, '#define ENLARGE_RATIO (2^%d)\n\n', enlarge_ratio_log2);
 
-fprintf(fid, 'constant short2 coef[%d] = { \\ \n', num_pss*len_pss);
+fprintf(fid, '__constant short2 coef[%d] = { \\ \n', num_pss*len_pss);
 
 for i=1:(num_pss-1)
     for j=1:len_pss
