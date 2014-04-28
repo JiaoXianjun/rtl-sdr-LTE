@@ -26,9 +26,9 @@ freq_set = 1860e6;
 % set to 1 to use pre-captured file; set to 0 to use live dongle IQ samples (run "rtl_tcp -p 1234 -d 0" in shell first!)
 use_file_flag = 1; 
 % ------------------------------------------------------------------------------------
-rtl_sdr_bin_filename = '../scan-capture/frequency-1850-1880MHz/f1860_s1.92_g0_1s_strong.bin';% hit. -41.799kHz; Period PPM 22.3214PPM (hit at Try idx 1, pre-search pss 2, MIB pss 2 3)
+% rtl_sdr_bin_filename = '../scan-capture/frequency-1850-1880MHz/f1860_s1.92_g0_1s_strong.bin';% hit. -41.799kHz; Period PPM 22.3214PPM (hit at Try idx 1, pre-search pss 2, MIB pss 2 3)
 % rtl_sdr_bin_filename = '../scan-capture/frequency-1850-1880MHz/f1860_s1.92_g0_1s.bin';       %      -45kHz 17.3611PPM;
-% rtl_sdr_bin_filename = '../scan-capture/frequency-1880-1900MHz/f1890_s1.92_g0_1s.bin';       % hit. -41.117kHz, Period PPM 20.8333PPM (hit at Try idx 1)
+rtl_sdr_bin_filename = '../scan-capture/frequency-1880-1900MHz/f1890_s1.92_g0_1s.bin';       % hit. -41.117kHz, Period PPM 20.8333PPM (hit at Try idx 1)
 % rtl_sdr_bin_filename = '../scan-capture/frequency-2555-2575MHz/f2564.9_s1.92_g0_0.8s.bin';   % hit. 6.516kHz, Period PPM 27.7778PPM (hit at Try idx 3,0, but try 1 in C code, pre-search pss 2, MIB pss 1)
 % rtl_sdr_bin_filename = '../scan-capture/frequency-2555-2575MHz/f2565_s1.92_g0_1s.bin';       %      -35kHz (new alg -- 60kHz), 116.4426PPM
 % rtl_sdr_bin_filename = '../scan-capture/frequency-2555-2575MHz/f2564.9_s1.92_g0_1s.bin';     % hit. -36.1386kHz, Period PPM 111.1111PPM (hit at Try idx 8, but not hit in C code)

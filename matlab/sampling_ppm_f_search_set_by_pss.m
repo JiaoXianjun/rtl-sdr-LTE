@@ -73,7 +73,7 @@ end
 
 [~, sort_idx] = sort(max_peak_all, 'descend');
 
-max_reserve = 4;
+max_reserve = 1;
 above_par_idx = (peak_to_avg(sort_idx(1:max_reserve)) > 8.5);
 disp(['Hit        PAR ' num2str(peak_to_avg(sort_idx(1:max_reserve))) 'dB']);
 
