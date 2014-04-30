@@ -80,7 +80,7 @@ THRESH2_N_SIGMA = 3;
 % f_search_set = -100e3:5e3:100e3; % frequency offset searching range
 % f_search_set = -60e3:5e3:55e3; % frequency offset searching range; aligned to C
 f_search_set = -225e3:5e3:220e3; % frequency offset searching range; aligned to C
-% f_search_set = -40e3;
+% f_search_set = -95e3:5e3:90e3;
 
 pss_fo_set = pss_fo_set_gen(td_pss, f_search_set);
 
