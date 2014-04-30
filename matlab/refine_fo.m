@@ -16,19 +16,31 @@ for i=1:4
         pss_from_frame_start = k_factor_tmp*(1920 + 2*(128+9) + 1);
     end
     
-    pss_sp = frame_start + pss_from_frame_start;
+    pss_sp = frame_start + pss_from_frame_start + 3;
     
-    pss_fo = td_pss.*exp( -1i.*(0:(len_pss-1)).*fo_set(i).*2.*pi./fs );
+    pss_fo = conj( td_pss.*exp( 1i.*(0:(len_pss-1)).*fo_set(i).*2.*pi./fs ) );
     
     corr_val(i) = 0;
     pss_count = 0;
     
-    while (pss_sp + len_pss) <= len
+    while (pss_sp + len_pss + 1) <= len
         
         pss_idx = round(pss_sp);
         chn_tmp = capbuf(pss_idx : (pss_idx + len_pss - 1) );
-        corr_tmp = abs(sum(chn_tmp.*pss_fo));
+        corr_tmp = abs(sum(chn_tmp.*pss_fo)).^2;
+%         plot(angle(chn_tmp.*pss_fo));
         corr_val(i) = corr_val(i) + corr_tmp;
+
+        chn_tmp = capbuf(pss_idx+1 : (pss_idx+1 + len_pss - 1) );
+        corr_tmp = abs(sum(chn_tmp.*pss_fo)).^2;
+%         plot(angle(chn_tmp.*pss_fo));
+        corr_val(i) = corr_val(i) + corr_tmp;
+        
+        chn_tmp = capbuf(pss_idx-1 : (pss_idx-1 + len_pss - 1) );
+        corr_tmp = abs(sum(chn_tmp.*pss_fo)).^2;
+%         plot(angle(chn_tmp.*pss_fo));
+        corr_val(i) = corr_val(i) + corr_tmp;
+        
         pss_count = pss_count + 1;
         pss_sp = pss_sp + k_factor_tmp*5*1920;
     end
@@ -38,3 +50,6 @@ end
 
 [~, k_factor_idx] = max(corr_val);
 freq_new = fo_set(k_factor_idx);
+
+disp(['refine_fo corr_val ' num2str(corr_val)]);
+disp(['fo refined from ' num2str(freq) ' to ' num2str(freq_new)]);
