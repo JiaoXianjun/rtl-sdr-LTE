@@ -26,19 +26,19 @@ freq_set = 1860e6;
 % set to 1 to use pre-captured file; set to 0 to use live dongle IQ samples (run "rtl_tcp -p 1234 -d 0" in shell first!)
 use_file_flag = 1; 
 % ------------------------------------------------------------------------------------
-% rtl_sdr_bin_filename = '../scan-capture/frequency-1850-1880MHz/f1860_s1.92_g0_1s_strong.bin';% hit. -41.799kHz; Period PPM 22.3214PPM (hit at Try idx 1, pre-search pss 2, MIB pss 2 3)
-% rtl_sdr_bin_filename = '../scan-capture/frequency-1850-1880MHz/f1860_s1.92_g0_1s.bin';       %      -45kHz 17.3611PPM;
-rtl_sdr_bin_filename = '../scan-capture/frequency-1880-1900MHz/f1890_s1.92_g0_1s.bin';       % hit. -41.117kHz, Period PPM 20.8333PPM (hit at Try idx 1)
-% rtl_sdr_bin_filename = '../scan-capture/frequency-2555-2575MHz/f2564.9_s1.92_g0_0.8s.bin';   % hit. 6.516kHz, Period PPM 27.7778PPM (hit at Try idx 3,0, but try 1 in C code, pre-search pss 2, MIB pss 1)
-% rtl_sdr_bin_filename = '../scan-capture/frequency-2555-2575MHz/f2565_s1.92_g0_1s.bin';       %      -35kHz (new alg -- 60kHz), 116.4426PPM
-% rtl_sdr_bin_filename = '../scan-capture/frequency-2555-2575MHz/f2564.9_s1.92_g0_1s.bin';     % hit. -36.1386kHz, Period PPM 111.1111PPM (hit at Try idx 8, but not hit in C code)
-% rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz-know-PPM/f2645_s1.92_g0_SamplingPPM26.2_1s.bin';  % hit. -90.568kHz, Period PPM 27.7778PPM (hit at Try idx 1)
-% rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz-know-PPM/f2645_s1.92_g20_SamplingPPM26.2_1s.bin'; %      -89.531kHz, 26.2009PPM
-% rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz/f2645_s1.92_g0_1s.bin';       % hit. -89.529kHz, Period PPM 27.7778PPM (hit at Try idx 1, but try 3 in C code)
-% rtl_sdr_bin_filename = '../scan-capture/frequency-2575-2595MHz/f2585_s1.92_g0_0.8s.bin';     % hit. -94.266kHz (new alg: 26PPM, hit idx 6), Period PPM 7.4405PPM (hit at Try idx 3, pre-search pss 3, MIB pss 2)
-% rtl_sdr_bin_filename = '../scan-capture/frequency-2575-2595MHz/f2585_s1.92_g0_1s.bin';       % hit. -87.9667kHz, 25.1705PPM, (hit at Try idx 2, pre-search pss 3 1, MIB pss 3, but not hit in C code)
-% rtl_sdr_bin_filename = '../scan-capture/frequency-2595-2615MHz/f2604.9_s1.92_g0_0.8s.bin';     % hit. 4.9052kHz, Period PPM 25.0496PP (hit at Try idx 4)
-% rtl_sdr_bin_filename = '../scan-capture/frequency-2595-2615MHz/f2605_s1.92_g0_1s.bin';       %      -65kHz, 116.4426PPM
+% rtl_sdr_bin_filename = '../scan-capture/frequency-1850-1880MHz/f1860_s1.92_g0_1s_strong.bin';% hit.Try idx 1 -41.799kHz; Period PPM 22.3214PPM
+% rtl_sdr_bin_filename = '../scan-capture/frequency-1850-1880MHz/f1860_s1.92_g0_1s.bin';       % hit try idx 2 -43.9832kHz 23.2155PPM;
+rtl_sdr_bin_filename = '../scan-capture/frequency-1880-1900MHz/f1890_s1.92_g0_1s.bin';       % hit.Try idx 1 -41.117kHz, Period PPM 20.8333PPM
+% rtl_sdr_bin_filename = '../scan-capture/frequency-2555-2575MHz/f2564.9_s1.92_g0_0.8s.bin';   % hit.Try idx 1 6.516kHz, Period PPM 27.7778PPM
+% rtl_sdr_bin_filename = '../scan-capture/frequency-2555-2575MHz/f2565_s1.92_g0_1s.bin';       % hit try idx 1 -135.8122kHz 112.0323PPM;
+% rtl_sdr_bin_filename = '../scan-capture/frequency-2555-2575MHz/f2564.9_s1.92_g0_1s.bin';     % hit try idx 1 -36.1409kHz 112.4597PPM;
+% rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz-know-PPM/f2645_s1.92_g0_SamplingPPM26.2_1s.bin';  % hit try idx 1 -90.567kHz 29.4891PPM;
+% rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz-know-PPM/f2645_s1.92_g20_SamplingPPM26.2_1s.bin';  % hit try idx 1  -89.4115kHz 25.0637PPM;
+% rtl_sdr_bin_filename = '../scan-capture/frequency-2635-2655MHz/f2645_s1.92_g0_1s.bin';       % hit. try idx 1 -89.529kHz, Period PPM 27.7778PPM
+% rtl_sdr_bin_filename = '../scan-capture/frequency-2575-2595MHz/f2585_s1.92_g0_0.8s.bin';     % hit. try idx 1 -94.266kHz 26PPM
+% rtl_sdr_bin_filename = '../scan-capture/frequency-2575-2595MHz/f2585_s1.92_g0_1s.bin';       % hit. try idx 1 -87.9667kHz, 25.1705PPM
+% rtl_sdr_bin_filename = '../scan-capture/frequency-2595-2615MHz/f2604.9_s1.92_g0_0.8s.bin';     % hit. try idx 1 4.9052kHz, Period PPM 25.0496PP
+% rtl_sdr_bin_filename = '../scan-capture/frequency-2595-2615MHz/f2605_s1.92_g0_1s.bin';       % hit. try idx 1      -139.8937kHz, 111.1226PPM
 
 % % !!! Actually each time run with rtl-sdr dongle, this script saves a bin
 % % file automatically!!!
@@ -206,6 +206,7 @@ for freq_idx = 1 : loop_size
         disp(['Try idx ' num2str(try_idx)]);
         
         r = r_all(:,freq_idx,try_idx);
+        r = r - mean(r); % remove DC
 
         disp(['Input averaged abs: ' num2str( mean(abs([real(r); imag(r)])) )]);
 
@@ -262,44 +263,41 @@ for freq_idx = 1 : loop_size
             peaks=peak_search(xc_incoherent_collapsed_pow,xc_incoherent_collapsed_frq,Z_th1,dynamic_f_search_set,fc, sampling_carrier_twist,NaN);
         end
 
-        detect_flag = zeros(1, length(peaks));
-        tdd_flags = zeros(1, length(peaks));
-        for i=1:length(peaks)
-            for tdd_flag=0:1
-                peak = sss_detect(peaks(i),capbuf,THRESH2_N_SIGMA,fc,sampling_carrier_twist,tdd_flag);
-                if ~isnan( peak.n_id_1 )
-                    break;
+        tdd_flags = kron(ones(1, length(peaks)), [0 1]); % even: tdd_flag 0; odd : tdd_flag 1
+        peaks_expand(2: 2 : (2*length(peaks))) = peaks;
+        peaks_expand(1: 2 : (2*length(peaks))) = peaks;
+        
+        detect_flag = zeros(1, length(peaks_expand));
+        for i=1:length(peaks_expand)
+            tdd_flag = tdd_flags(i);
+            peak = sss_detect(peaks_expand(i),capbuf,THRESH2_N_SIGMA,fc,sampling_carrier_twist,tdd_flag);
+            if ~isnan( peak.n_id_1 )
+                peak=pss_sss_foe(peak,capbuf,fc,sampling_carrier_twist,tdd_flag);
+                [tfg, tfg_timestamp]=extract_tfg(peak,capbuf,fc,sampling_carrier_twist);
+                [tfg_comp, tfg_comp_timestamp, peak]=tfoec(peak,tfg,tfg_timestamp,fc,sampling_carrier_twist);
+                peak=decode_mib(peak,tfg_comp);
+                if isnan( peak.n_rb_dl)
+                    continue;
                 end
+                if tdd_flag == 1
+                    disp('  Detected a TDD cell!');
+                else
+                    disp('  Detected a FDD cell!');
+                end
+                if use_file_flag == 1
+                    disp(['  at ' rtl_sdr_bin_filename]);
+                else
+                    disp(['  at ' num2str(fc/1e6) 'MHz']);
+                end
+                disp(['    cell ID: ' num2str(peak.n_id_cell)]);
+                disp(['    PSS  ID: ' num2str(peak.n_id_2+1)]);
+                disp(['    RX power level: ' num2str(10*log10(peak.pow))]);
+                disp(['    residual frequency offset: ' num2str(peak.freq_superfine)]);
+                peaks_expand(i) = peak;
+                detect_flag(i) = 1;
             end
-            if isnan( peak.n_id_1 )
-                continue;
-            end
-            peak=pss_sss_foe(peak,capbuf,fc,sampling_carrier_twist,tdd_flag);
-            [tfg, tfg_timestamp]=extract_tfg(peak,capbuf,fc,sampling_carrier_twist);
-            [tfg_comp, tfg_comp_timestamp, peak]=tfoec(peak,tfg,tfg_timestamp,fc,sampling_carrier_twist);
-            peak=decode_mib(peak,tfg_comp);
-            if isnan( peak.n_rb_dl)
-                continue;
-            end
-            if tdd_flag == 1
-                disp('  Detected a TDD cell!');
-            else
-                disp('  Detected a FDD cell!');
-            end
-            if use_file_flag == 1
-                disp(['  at ' rtl_sdr_bin_filename]);
-            else
-                disp(['  at ' num2str(fc/1e6) 'MHz']);
-            end
-            disp(['    cell ID: ' num2str(peak.n_id_cell)]);
-            disp(['    PSS  ID: ' num2str(peak.n_id_2+1)]);
-            disp(['    RX power level: ' num2str(10*log10(peak.pow))]);
-            disp(['    residual frequency offset: ' num2str(peak.freq_superfine)]);
-            peaks(i) = peak;
-            detect_flag(i) = 1;
-            tdd_flags(i) = tdd_flag;
         end
-        peaks_store{freq_idx} = peaks;
+        peaks_store{freq_idx} = peaks_expand;
         detect_flag_store{freq_idx} = detect_flag;
         tdd_flags_store{freq_idx} = tdd_flags;
         if sum(detect_flag)==0
