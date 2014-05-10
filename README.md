@@ -1,6 +1,10 @@
 rtl-sdr-LTE
 ===========
 
+run: matlab/CellSearch.m
+
+have fun!
+
 News:
 
 2014-03-16
