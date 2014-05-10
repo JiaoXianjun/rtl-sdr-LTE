@@ -271,8 +271,8 @@ for freq_idx = 1 : loop_size
             peak = sss_detect(peaks(i),capbuf,THRESH2_N_SIGMA,fc,sampling_carrier_twist,tdd_flag);
             if ~isnan( peak.n_id_1 )
                 peak=pss_sss_foe(peak,capbuf,fc,sampling_carrier_twist,tdd_flag);
-                [tfg, tfg_timestamp]=extract_tfg(peak,capbuf,fc,sampling_carrier_twist);
-                [tfg_comp, tfg_comp_timestamp, peak]=tfoec(peak,tfg,tfg_timestamp,fc,sampling_carrier_twist);
+                [tfg, tfg_timestamp]=extract_tfg(peak,capbuf,fc,sampling_carrier_twist, 6);
+                [tfg_comp, tfg_comp_timestamp, peak]=tfoec(peak,tfg,tfg_timestamp,fc,sampling_carrier_twist, 6);
                 peak=decode_mib(peak,tfg_comp);
                 if isnan( peak.n_rb_dl)
                     continue;
