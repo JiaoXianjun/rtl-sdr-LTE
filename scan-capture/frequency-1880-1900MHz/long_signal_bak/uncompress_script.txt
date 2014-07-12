@@ -1,0 +1,3 @@
+cat x* > x.tar
+
+then use linux default tools.
