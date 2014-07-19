@@ -5,6 +5,8 @@ run: matlab/CellSearch.m
 
 have fun!
 
+Latest algorithm imporvements are in here: https://github.com/JiaoXianjun/LTE-Cell-Scanner . Top layer script: Matlab/test_CellSearch.m
+
 News:
 
 2014-03-16
