@@ -1,7 +1,7 @@
 rtl-sdr-LTE
 ===========
 
-**14 Aug. 2014: Losing job. Finding new opportunity!**
+**14 Aug. 2014: Losing job. Finding new opportunity! (Find my profile at <a href="https://www.researchgate.net/profile/Xianjun_Jiao?ev=hdr_xprf">researchgate</a> and <a href="http://www.linkedin.com/pub/xianjun-jiao/41/696/7a5">linkedin</a>)**
 
 run: matlab/CellSearch.m
 
