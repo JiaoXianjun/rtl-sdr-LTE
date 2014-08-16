@@ -1,6 +1,8 @@
 rtl-sdr-LTE
 ===========
 
+14 Aug. 2014: Losing job. Finding new opportunity!
+
 run: matlab/CellSearch.m
 
 have fun!
